@@ -18,6 +18,8 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+login_manager.login_message = 'Silakan login untuk mengakses halaman ini'
+login_manager.login_message_category = 'info'
 
 class Admin(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
