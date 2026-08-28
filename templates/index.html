@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MPK MAS Assalafiyyah - Menampung aspirasi dan pengawasan program siswa">
+  <title>MPK MAS ASSALAFIYYAH — Menampung Aspirasi & Pengawasan Siswa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'mpk-primary': '#0f6b4f',
+            'mpk-primary-dark': '#074a31',
+            'mpk-primary-light': '#1a8c67',
+            'mpk-accent': '#ffd166',
+            'mpk-accent-light': '#ffdb8c',
+            'mpk-muted': '#6b7280',
+            'mpk-muted-dark': '#4b5563',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'mpk': '0 4px 12px rgba(15, 107, 79, 0.1)',
+            'mpk-lg': '0 10px 24px rgba(15, 107, 79, 0.15)',
+            'mpk-sm': '0 2px 6px rgba(15, 107, 79, 0.08)',
+          },
+          borderRadius: {
+            'mpk': '16px',
+            'mpk-lg': '20px',
+            'mpk-xl': '24px',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='krisismpk.css') }}">
+</head>
+<body class="bg-gradient-to-b from-slate-50 via-emerald-50 to-slate-50 overflow-x-hidden">
+
+  <!-- HEADER & NAVIGATION -->
+  <header class="bg-gradient-to-r from-white via-emerald-50/30 to-white backdrop-blur-xl border-b border-mpk-primary/10 sticky top-0 z-40 shadow-mpk-sm">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex items-center justify-between gap-4 py-5">
+        <div class="brand flex items-center gap-4">
+          <img src="{{ url_for('static', filename='assets/mpkphotos.jpeg') }}" alt="Logo MPK MAS Assalafiyyah" class="w-16 h-16 object-cover rounded-xl shadow-mpk">
+          <div>
+            <div class="title font-extrabold text-lg tracking-tight bg-gradient-to-r from-mpk-primary to-mpk-primary-dark bg-clip-text text-transparent">MPK MAS ASSALAFIYYAH</div>
+            <div class="subtitle text-xs text-mpk-muted font-medium">Majelis Permusyawaratan Kelas</div>
+          </div>
+        </div>
+        <nav id="mainNav" class="hidden md:flex items-center gap-1">
+          <a href="#home" class="px-4 py-2 text-sm font-semibold text-mpk-primary hover:text-mpk-primary-dark transition-colors">Beranda</a>
+          <a href="#tentang" class="px-4 py-2 text-sm font-semibold text-mpk-primary hover:text-mpk-primary-dark transition-colors">Tentang</a>
+          <a href="#program" class="px-4 py-2 text-sm font-semibold text-mpk-primary hover:text-mpk-primary-dark transition-colors">Program</a>
+          <a class="cta bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-6 py-3 rounded-mpk font-semibold text-sm shadow-mpk hover:shadow-mpk-lg transition-all hover:-translate-y-0.5" href="#kontak">Hubungi Kami</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6">
+
+    <!-- HERO SECTION -->
+    <section id="home" class="hero">
+      <div class="hero-content fade-up">
+        <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold text-transparent bg-gradient-to-r from-mpk-primary via-mpk-primary-dark to-emerald-900 bg-clip-text leading-tight">Menampung Aspirasi Siswa — MPK MAS Assalafiyyah</h1>
+        <p class="mt-6 text-mpk-muted-dark text-sm md:text-base leading-relaxed max-w-2xl">MPK bertindak sebagai wahana aspirasi dan pengawas program madrasah yang dijalankan OSIM. Kami bekerja secara objektif, transparan, dan berorientasi pada perbaikan kualitas kegiatan siswa.</p>
+        <div class="actions mt-8 flex flex-wrap gap-4">
+          <a class="btn-primary bg-gradient-to-r from-mpk-primary to-emerald-800 text-white px-6 py-3 rounded-mpk font-bold text-base shadow-mpk-lg hover:shadow-mpk-xl transition-all hover:-translate-y-1 hover:scale-105 flex items-center gap-3" href="{{ url_for('krisisan') }}">
+            <i class="fas fa-bullhorn text-lg"></i> Sampaikan Aspirasi
+          </a>
+          <a class="btn-secondary bg-gradient-to-r from-white/80 to-emerald-50/80 text-mpk-primary px-6 py-3 rounded-mpk font-bold text-base shadow-mpk-sm hover:bg-white hover:shadow-mpk transition-all border border-mpk-primary/20 flex items-center gap-3" href="#program">
+            <i class="fas fa-eye text-lg"></i> Lihat Program
+          </a>
+        </div>
+
+        <div class="info-grid mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="card fade-up bg-gradient-to-br from-white via-emerald-50/30 to-white p-8 rounded-mpk-lg shadow-mpk border border-mpk-primary/10 hover:shadow-mpk-xl hover:border-mpk-primary/30 transition-all duration-500 animate-card-glow flex flex-col items-center text-center group relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-mpk-primary/5 via-transparent to-mpk-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div class="icon text-mpk-primary text-5xl mb-6 transform group-hover:scale-110 transition-transform duration-500"><i class="fas fa-bullseye"></i></div>
+            <h3 class="text-xl font-bold text-mpk-primary-dark mb-4 z-10">Visi</h3>
+            <div class="h-px w-12 bg-gradient-to-r from-mpk-primary/40 to-mpk-primary/10 mb-4 z-10"></div>
+            <p class="text-mpk-muted-dark text-sm leading-relaxed flex-grow z-10">Menjadi lembaga pengawas yang responsif, akuntabel, dan proaktif dalam menyalurkan aspirasi siswa.</p>
+          </div>
+          <div class="card fade-up bg-gradient-to-br from-white via-emerald-50/30 to-white p-8 rounded-mpk-lg shadow-mpk border border-mpk-primary/10 hover:shadow-mpk-xl hover:border-mpk-primary/30 transition-all duration-500 animate-card-glow flex flex-col items-center text-center group relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-mpk-primary/5 via-transparent to-mpk-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div class="icon text-mpk-primary text-5xl mb-6 transform group-hover:scale-110 transition-transform duration-500"><i class="fas fa-sync-alt"></i></div>
+            <h3 class="text-xl font-bold text-mpk-primary-dark mb-4 z-10">Misi</h3>
+            <div class="h-px w-12 bg-gradient-to-r from-mpk-primary/40 to-mpk-primary/10 mb-4 z-10"></div>
+            <p class="text-mpk-muted-dark text-sm leading-relaxed flex-grow z-10">Memfasilitasi komunikasi, evaluasi kegiatan, dan mendorong partisipasi siswa dalam pembangunan madrasah.</p>
+          </div>
+          <div class="card fade-up bg-gradient-to-br from-white via-emerald-50/30 to-white p-8 rounded-mpk-lg shadow-mpk border border-mpk-primary/10 hover:shadow-mpk-xl hover:border-mpk-primary/30 transition-all duration-500 animate-card-glow flex flex-col items-center text-center group relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-mpk-primary/5 via-transparent to-mpk-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div class="icon text-mpk-primary text-5xl mb-6 transform group-hover:scale-110 transition-transform duration-500"><i class="fas fa-tasks"></i></div>
+            <h3 class="text-xl font-bold text-mpk-primary-dark mb-4 z-10">Tugas</h3>
+            <div class="h-px w-12 bg-gradient-to-r from-mpk-primary/40 to-mpk-primary/10 mb-4 z-10"></div>
+            <p class="text-mpk-muted-dark text-sm leading-relaxed flex-grow z-10">Menampung aspirasi, melakukan pengawasan, dan memberikan rekomendasi perbaikan program.</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="hero-aside fade-right mt-12 md:mt-0">
+        <div class="card info-card bg-white p-8 rounded-mpk-lg shadow-mpk-lg border border-mpk-primary/10 fade-right group relative overflow-hidden hover:shadow-mpk-xl hover:border-mpk-primary/30 transition-all duration-500">
+          <div class="absolute inset-0 bg-gradient-to-r from-mpk-primary/5 via-transparent to-mpk-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+          <div class="info-title font-bold text-lg text-mpk-primary-dark mb-6 relative z-10"><i class="fas fa-info-circle text-mpk-primary mr-3"></i> Informasi Sekolah</div>
+          <div class="info-content space-y-4 relative z-10">
+            <p class="flex items-center gap-3 text-mpk-muted-dark text-sm"><i class="fas fa-map-marker-alt text-mpk-primary text-base"></i> Jl. Kyai Masduqi, Mlangi, Nogotirto, Gamping, Sleman, DIY 55292</p>
+            <p class="flex items-center gap-3 text-mpk-muted-dark text-sm"><i class="fas fa-envelope text-mpk-primary text-base"></i> <a href="mailto:mpkmasassalafiyyah@gmail.com" class="text-mpk-primary font-medium hover:underline">mpkmasassalafiyyah@gmail.com</a></p>
+            <div class="social-links-hero flex gap-4 mt-6">
+              <a href="https://www.instagram.com/maassalafiyyahmlangi/" class="social-link-hero w-12 h-12 flex items-center justify-center rounded-lg text-mpk-primary hover:bg-gradient-to-br hover:from-emerald-500 hover:to-emerald-700 hover:text-white transition-all hover:scale-110" title="Instagram" target="_blank"><i class="fab fa-instagram text-2xl"></i></a>
+              <a href="https://www.youtube.com/@maassalafiyyah" class="social-link-hero w-12 h-12 flex items-center justify-center rounded-lg text-mpk-primary hover:bg-gradient-to-br hover:from-red-500 hover:to-red-700 hover:text-white transition-all hover:scale-110" title="YouTube" target="_blank"><i class="fab fa-youtube text-2xl"></i></a>
+              <a href="https://www.tiktok.com/@ma.assalafiyyahmlangi" class="social-link-hero w-12 h-12 flex items-center justify-center rounded-lg text-mpk-primary hover:bg-gradient-to-br hover:from-black hover:to-gray-800 hover:text-white transition-all hover:scale-110" title="TikTok" target="_blank"><i class="fab fa-tiktok text-2xl"></i></a>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- SECTION TENTANG -->
+    <section id="tentang" class="fade-up py-20">
+      <div class="section-header text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-transparent bg-gradient-to-r from-mpk-primary to-mpk-primary-dark bg-clip-text">Tentang MPK MAS ASSALAFIYYAH</h2>
+        <p class="mt-4 text-base text-mpk-muted">Majelis Perwakilan Kelas sebagai suara dan pengawal kepentikan siswa</p>
+      </div>
+      <div class="tentang-content bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-mpk-xl p-12 shadow-mpk-lg border border-mpk-primary/10 max-w-3xl mx-auto group relative overflow-hidden hover:shadow-mpk-xl hover:border-mpk-primary/20 transition-all duration-500 fade-up">
+        <div class="absolute inset-0 bg-gradient-to-r from-mpk-primary/3 via-transparent to-mpk-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+        <h3 class="text-xl font-bold text-mpk-primary-dark mb-4 flex items-center gap-3"><span class="w-1 h-8 bg-gradient-to-b from-mpk-primary to-mpk-primary-light rounded"></span>Apa Itu MPK?</h3>
+        <p class="text-mpk-muted-dark text-sm leading-relaxed mb-6">MPK (Majelis Perwakilan Kelas) di MAS Assalafiyyah Mlangi adalah lembaga legislatif siswa yang beranggotakan perwakilan dari setiap kelas. MPK menjadi wadah permusyawaratan untuk menyampaikan aspirasi siswa.</p>
+
+        <h3 class="text-xl font-bold text-mpk-primary-dark mb-4 mt-8 flex items-center gap-3"><span class="w-1 h-8 bg-gradient-to-b from-mpk-primary to-mpk-primary-light rounded"></span>Visi</h3>
+        <p class="text-mpk-muted-dark text-sm leading-relaxed italic pl-4 border-l-4 border-mpk-primary/30 mb-6">"Mewujudkan lembaga legislatif siswa yang amanah, transparan, dan berintegritas."</p>
+
+        <h3 class="text-xl font-bold text-mpk-primary-dark mb-4 mt-8 flex items-center gap-3"><span class="w-1 h-8 bg-gradient-to-b from-mpk-primary to-mpk-primary-light rounded"></span>Misi</h3>
+        <ul class="space-y-3 text-mpk-muted-dark text-sm">
+          <li class="flex items-start gap-3"><span class="text-mpk-primary font-bold mt-0.5">•</span> <span>Menjadi wadah penyampaian aspirasi siswa secara santun.</span></li>
+          <li class="flex items-start gap-3"><span class="text-mpk-primary font-bold mt-0.5">•</span> <span>Mendorong terciptanya kerja sama harmonis antar organisasi.</span></li>
+          <li class="flex items-start gap-3"><span class="text-mpk-primary font-bold mt-0.5">•</span> <span>Mewujudkan sistem organisasi yang tertib.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SECTION PROGRAM -->
+    <section id="program" class="py-20">
+      <div class="section-header fade-up text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-extrabold text-transparent bg-gradient-to-r from-mpk-primary to-mpk-primary-dark bg-clip-text">Program Kerja MPK</h2>
+        <p class="mt-4 text-lg text-mpk-muted">Inisiatif dan kegiatan yang kami lakukan demi kesejahteraan seluruh siswa</p>
+      </div>
+      <div class="program-grid grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="program-card zoom-in bg-gradient-to-br from-white via-emerald-50/20 to-white p-10 rounded-mpk-xl shadow-mpk border border-mpk-primary/10 text-center hover:shadow-mpk-xl hover:-translate-y-3 transition-all duration-500 group relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-mpk-primary/5 via-transparent to-mpk-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="program-icon text-6xl text-mpk-primary mb-6 transform group-hover:scale-110 transition-transform duration-500"><i class="fas fa-comments"></i></div>
+          <h3 class="text-2xl font-bold text-mpk-primary-dark mb-4">Penampung Aspirasi</h3>
+          <p class="text-mpk-muted-dark leading-relaxed">Menampung kritik, saran, dan aspirasi dari siswa, kemudian dievaluasi setiap bulan.</p>
+        </div>
+        <div class="program-card zoom-in bg-gradient-to-br from-white via-blue-50/20 to-white p-10 rounded-mpk-xl shadow-mpk border border-blue-500/10 text-center hover:shadow-mpk-xl hover:-translate-y-3 transition-all duration-500 group relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="program-icon text-6xl text-blue-600 mb-6 transform group-hover:scale-110 transition-transform duration-500"><i class="fas fa-eye"></i></div>
+          <h3 class="text-2xl font-bold text-blue-900 mb-4">Pengawasan OSIM</h3>
+          <p class="text-mpk-muted-dark leading-relaxed">Mengadakan rapat evaluasi bulanan untuk meninjau pelaksanaan program OSIM.</p>
+        </div>
+        <div class="program-card zoom-in bg-gradient-to-br from-white via-amber-50/20 to-white p-10 rounded-mpk-xl shadow-mpk border border-amber-500/10 text-center hover:shadow-mpk-xl hover:-translate-y-3 transition-all duration-500 group relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="program-icon text-6xl text-amber-600 mb-6 transform group-hover:scale-110 transition-transform duration-500"><i class="fas fa-shield-alt"></i></div>
+          <h3 class="text-2xl font-bold text-amber-900 mb-4">Keamanan</h3>
+          <p class="text-mpk-muted-dark leading-relaxed">Mengawal aturan madrasah agar dilaksanakan dengan konsisten oleh seluruh siswa.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION KONTAK -->
+    <section id="kontak" class="fade-up py-20">
+      <div class="kontak-section bg-gradient-to-br from-mpk-primary via-emerald-700 to-mpk-primary-dark rounded-mpk-xl p-16 text-center max-w-3xl mx-auto shadow-2xl">
+        <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-6">Hubungi MPK MAS ASSALAFIYYAH</h2>
+        <p class="text-lg text-white/90 mb-10 leading-relaxed">Ada kritik, saran, atau aspirasi yang ingin disampaikan? Kami siap mendengarkan Anda. Isi form aspirasi melalui tautan di bawah ini.</p>
+        <a class="btn-cta inline-block bg-gradient-to-r from-mpk-accent via-mpk-accent-light to-yellow-300 text-mpk-primary-dark px-10 py-5 rounded-mpk font-extrabold text-xl shadow-2xl hover:shadow-3xl transition-all hover:-translate-y-2 hover:scale-105 duration-300 flex items-center gap-4 mx-auto" href="{{ url_for('krisisan') }}">
+          <i class="fas fa-pen-alt text-2xl"></i> Isi Form Aspirasi Sekarang
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-20 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-slate-300">
+    <div class="footer-content max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="text-center md:text-left">
+        <div class="text-lg font-semibold bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">© 2024 MPK MAS ASSALAFIYYAH</div>
+        <div class="text-sm text-slate-400 mt-1">All Rights Reserved</div>
+      </div>
+      <div class="footer-links flex flex-wrap gap-8">
+        <a href="#home" class="text-slate-400 hover:text-emerald-400 transition-colors font-medium">Beranda</a>
+        <a href="#tentang" class="text-slate-400 hover:text-emerald-400 transition-colors font-medium">Tentang</a>
+        <a href="#program" class="text-slate-400 hover:text-emerald-400 transition-colors font-medium">Program</a>
+        <a href="#kontak" class="text-slate-400 hover:text-emerald-400 transition-colors font-medium">Kontak</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Intersection Observer for fade animations
+    const elements = document.querySelectorAll('.fade-up, .fade-left, .fade-right, .zoom-in');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+        }
+      });
+    }, { threshold: 0.15 });
+    elements.forEach(el => observer.observe(el));
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mainNav = document.getElementById('mainNav');
+    if (mobileMenuBtn) {
+      mobileMenuBtn.style.display = 'block';
+      mobileMenuBtn.addEventListener('click', () => {
+        mainNav.classList.toggle('mobile-open');
+      });
+    }
+
+    // Welcome Audio - Play on every page load
+    (function() {
+      const welcomeAudio = new Audio('assets/audio/welcome.mp3');
+      welcomeAudio.autoplay = true;
+      
+      function playAudio() {
+        welcomeAudio.play().then(() => {
+          console.log('Welcome audio playing');
+        }).catch(error => {
+          console.log('Autoplay blocked, waiting for user interaction:', error);
+        });
+        
+        document.removeEventListener('click', playAudio);
+        document.removeEventListener('touchstart', playAudio);
+        document.removeEventListener('keydown', playAudio);
+      }
+      
+      document.addEventListener('click', playAudio, { once: true });
+      document.addEventListener('touchstart', playAudio, { once: true });
+      document.addEventListener('keydown', playAudio, { once: true });
+      
+      welcomeAudio.addEventListener('canplaythrough', () => {
+        welcomeAudio.play().catch(() => {});
+      });
+    })();
+  </script>
+</body>
+</html>

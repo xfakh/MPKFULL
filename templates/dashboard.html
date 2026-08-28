@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin MPK - Aspirasi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'mpk-primary': '#0f6b4f',
+            'mpk-primary-dark': '#074a31',
+            'mpk-accent': '#ffd166',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fadeIn { animation: fadeIn 0.5s ease; }
+    .animate-slideUp { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-emerald-50/30 to-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <header class="mb-8 animate-slideUp">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-extrabold text-mpk-primary-dark mb-2">Dashboard Admin MPK</h1>
+          <p class="text-mpk-muted">Manajemen Aspirasi Siswa</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <p class="text-sm text-mpk-muted">Admin: <span id="adminUsername" class="font-semibold text-mpk-primary">-</span></p>
+            <p class="text-sm text-mpk-muted">Total Aspirasi: <span id="totalCount" class="font-bold text-mpk-primary">0</span></p>
+          </div>
+          <button onclick="refreshData()" class="bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all">
+            <i class="fas fa-sync-alt mr-2"></i>Refresh
+          </button>
+          <button onclick="logout()" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all">
+            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex flex-col md:flex-row gap-8">
+      <!-- FILTER SIDEBAR (Toggle) -->
+      <div id="filterSidebar" class="w-full md:w-64 bg-white rounded-2xl shadow-lg border border-mpk-primary/10 p-6 animate-slideUp hidden md:block">
+        <div class="mb-6">
+          <h3 class="text-lg font-bold text-mpk-primary-dark mb-4 flex items-center gap-2">
+            <i class="fas fa-filter text-mpk-primary"></i> Filter
+          </h3>
+          
+          <div class="space-y-4">
+            <!-- Filter Kelas -->
+            <div>
+              <label class="block text-sm font-semibold text-mpk-muted-dark mb-2">Kelas</label>
+              <select id="filterKelas" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none bg-white">
+                <option value="">Semua Kelas</option>
+                <option value="10A">10A</option>
+                <option value="10B">10B</option>
+                <option value="10C">10C</option>
+                <option value="10D">10D</option>
+                <option value="10E">10E</option>
+                <option value="11A">11A</option>
+                <option value="11B">11B</option>
+                <option value="11C">11C</option>
+                <option value="11D">11D</option>
+                <option value="11E">11E</option>
+                <option value="12A">12A</option>
+                <option value="12B">12B</option>
+                <option value="12C">12C</option>
+                <option value="12D">12D</option>
+                <option value="12E">12E</option>
+              </select>
+            </div>
+            
+            <!-- Filter Kategori -->
+            <div>
+              <label class="block text-sm font-semibold text-mpk-muted-dark mb-2">Kategori</label>
+              <select id="filterKategori" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none bg-white">
+                <option value="">Semua Kategori</option>
+                <option value="Akademik">Akademik</option>
+                <option value="Non-akademik">Non-akademik</option>
+                <option value="Fasilitas">Fasilitas</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            
+            <button onclick="applyFilters()" class="w-full bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2">
+              <i class="fas fa-check"></i> Terapkan Filter
+            </button>
+          </div>
+        </div>
+        
+        <!-- Status Filter -->
+        <div>
+          <h3 class="text-lg font-bold text-mpk-primary-dark mb-4 flex items-center gap-2">
+            <i class="fas fa-tasks text-mpk-primary"></i> Status
+          </h3>
+          
+          <div class="space-y-2">
+            <button onclick="filterStatus('all')" id="btn-all" class="w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white">
+              <i class="fas fa-list mr-2"></i>Semua (<span id="count-all">0</span>)
+            </button>
+            <button onclick="filterStatus('pending')" id="btn-pending" class="w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+              <i class="fas fa-clock mr-2"></i>Belum Diproses (<span id="count-pending">0</span>)
+            </button>
+            <button onclick="filterStatus('diproses')" id="btn-diproses" class="w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+              <i class="fas fa-hourglass-half mr-2"></i>Diproses (<span id="count-diproses">0</span>)
+            </button>
+            <button onclick="filterStatus('selesai')" id="btn-selesai" class="w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+              <i class="fas fa-check-circle mr-2"></i>Selesai (<span id="count-selesai">0</span>)
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- TABEL ASPIRASI -->
+      <div class="flex-1 bg-white rounded-2xl shadow-lg border border-mpk-primary/10 overflow-hidden animate-fadeIn">
+        <div class="border-b border-slate-200 p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <button onclick="toggleFilterSidebar()" class="md:hidden text-mpk-primary hover:text-mpk-primary-dark text-2xl transition-colors" title="Toggle Filter">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <div>
+                <h3 class="text-lg font-bold text-mpk-primary-dark">Daftar Aspirasi</h3>
+                <p class="text-sm text-mpk-muted mt-1" id="filterInfo">Menampilkan semua aspirasi</p>
+              </div>
+            </div>
+            <button onclick="resetFilters()" class="bg-gradient-to-r from-slate-100 via-white to-slate-100 text-mpk-muted-dark border border-slate-300 px-4 py-2 rounded-lg font-semibold text-sm hover:border-mpk-primary/30 hover:text-mpk-primary transition-all">
+              <i class="fas fa-redo mr-2"></i>Reset Filter
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gradient-to-r from-slate-50 via-emerald-50/30 to-slate-50">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-bold text-mpk-muted uppercase tracking-wider">No</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-mpk-muted uppercase tracking-wider">Nama</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-mpk-muted uppercase tracking-wider">Kelas</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-mpk-muted uppercase tracking-wider">Kategori</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-mpk-muted uppercase tracking-wider">Deskripsi</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-mpk-muted uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-mpk-muted uppercase tracking-wider">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="aspirasiTable" class="divide-y divide-slate-100">
+            </tbody>
+          </table>
+        </div>
+
+        <div id="emptyState" class="hidden p-12 text-center">
+          <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-inbox text-4xl text-slate-400"></i>
+          </div>
+          <p class="text-slate-500 text-lg">Belum ada aspirasi</p>
+          <p class="text-sm text-slate-400 mt-2">Coba ubah filter atau reset filter untuk menampilkan semua data</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="authWarning" class="mt-8 text-center text-sm text-slate-400 hidden">
+      <i class="fas fa-lock mr-2"></i>
+      Anda perlu login untuk mengakses halaman ini.
+      <a href="{{ url_for('login') }}" class="text-mpk-primary hover:underline ml-1">Login disini</a>
+    </div>
+  </div>
+
+  <script>
+    let aspirasiData = [];
+    let currentFilter = 'all';
+    let currentKelas = '';
+    let currentKategori = '';
+    let isAuthenticated = false;
+
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/check-auth');
+        const result = await response.json();
+        
+        if (result.authenticated) {
+          isAuthenticated = true;
+          document.getElementById('adminUsername').textContent = result.admin.username;
+          document.getElementById('authWarning').classList.add('hidden');
+          return true;
+        } else {
+          window.location.href = '/login';
+          return false;
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        window.location.href = '/login';
+        return false;
+      }
+    }
+
+    async function logout() {
+      if (!confirm('Apakah Anda yakin ingin logout?')) return;
+      
+      try {
+        await fetch('/logout');
+        window.location.href = '/login';
+      } catch (error) {
+        alert('Gagal logout');
+      }
+    }
+
+    async function fetchData() {
+      try {
+        let url = '/api/aspirasi?';
+        
+        if (currentFilter && currentFilter !== 'all') {
+          url += `status=${currentFilter}&`;
+        }
+        
+        if (currentKelas) {
+          url += `kelas=${currentKelas}&`;
+        }
+        
+        if (currentKategori) {
+          url += `kategori=${currentKategori}&`;
+        }
+        
+        url = url.slice(0, -1);
+        
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        if (result.success) {
+          aspirasiData = result.data;
+          renderTable();
+          updateFilterInfo();
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        document.getElementById('aspirasiTable').innerHTML = 
+          '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Gagal memuat data. Pastikan API tersedia.</td></tr>';
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('aspirasiTable');
+      const emptyState = document.getElementById('emptyState');
+      const totalCount = document.getElementById('totalCount');
+      
+      let filteredData = aspirasiData;
+      
+      if (currentFilter !== 'all') {
+        filteredData = aspirasiData.filter(item => item.status === currentFilter);
+      }
+      
+      totalCount.textContent = aspirasiData.length;
+      
+      if (filteredData.length === 0) {
+        emptyState.classList.remove('hidden');
+        tbody.innerHTML = '';
+        updateFilterCount();
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      
+       tbody.innerHTML = filteredData.map((item, index) => `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-6 py-4 text-sm text-slate-600">${index + 1}</td>
+          <td class="px-6 py-4">
+            <div class="text-sm font-bold text-slate-900">${escapeHtml(item.nama)}</div>
+            <div class="text-xs text-mpk-muted">${escapeHtml(item.gender)}</div>
+          </td>
+          <td class="px-6 py-4 text-sm text-slate-700">${escapeHtml(item.kelas)}</td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-mpk-primary/10 text-mpk-primary">
+              ${escapeHtml(item.kategori)}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-sm text-slate-700 max-w-xs">
+            <div class="truncate" title="${escapeHtml(item.deskripsi)}">${escapeHtml(item.deskripsi)}</div>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+              item.status === 'pending' ? 'bg-red-100 text-red-700' :
+              item.status === 'diproses' ? 'bg-mpk-accent text-mpk-primary-dark' :
+              'bg-emerald-100 text-emerald-700'
+            }">
+              ${item.status === 'pending' ? '<i class="fas fa-clock mr-1"></i>' :
+                item.status === 'diproses' ? '<i class="fas fa-hourglass-half mr-1"></i>' :
+                '<i class="fas fa-check mr-1"></i>'}
+              ${escapeHtml(item.status)}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex gap-2">
+              ${item.status === 'pending' ? `
+              <button onclick="updateStatus(${item.id}, 'diproses')" class="text-mpk-accent hover:text-mpk-primary-dark transition-colors">
+                <i class="fas fa-hourglass-half text-lg"></i>
+              </button>
+              ` : ''}
+              <button onclick="updateStatus(${item.id}, 'selesai')" class="text-emerald-600 hover:text-emerald-700 transition-colors">
+                <i class="fas fa-check text-lg"></i>
+              </button>
+              <button onclick="deleteAspirasi(${item.id})" class="text-red-500 hover:text-red-700 transition-colors">
+                <i class="fas fa-trash text-lg"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      
+       updateFilterCount();
+    }
+
+    function applyFilters() {
+      const kelas = document.getElementById('filterKelas').value;
+      const kategori = document.getElementById('filterKategori').value;
+      
+      currentKelas = kelas;
+      currentKategori = kategori;
+      
+      fetchData();
+    }
+    
+    function resetFilters() {
+      currentFilter = 'all';
+      currentKelas = '';
+      currentKategori = '';
+      
+      document.getElementById('filterKelas').value = '';
+      document.getElementById('filterKategori').value = '';
+      
+      updateFilterButtons();
+      fetchData();
+    }
+    
+    function updateFilterInfo() {
+      let info = 'Menampilkan semua aspirasi';
+      
+      const filters = [];
+      
+      if (currentKelas) {
+        filters.push(`Kelas: ${currentKelas}`);
+      }
+      
+      if (currentKategori) {
+        filters.push(`Kategori: ${currentKategori}`);
+      }
+      
+      if (currentFilter && currentFilter !== 'all') {
+        filters.push(`Status: ${currentFilter}`);
+      }
+      
+      if (filters.length > 0) {
+        info = filters.join(', ');
+      }
+      
+      document.getElementById('filterInfo').textContent = info;
+    }
+    
+    function updateFilterButtons() {
+      const buttons = document.querySelectorAll('[id^="btn-"]');
+      buttons.forEach(btn => {
+        if (btn.id === `btn-${currentFilter}`) {
+          btn.classList.add('bg-gradient-to-r', 'from-mpk-primary', 'to-mpk-primary-dark', 'text-white', 'shadow-md');
+          btn.classList.remove('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+        } else {
+          btn.classList.remove('bg-gradient-to-r', 'from-mpk-primary', 'to-mpk-primary-dark', 'text-white', 'shadow-md');
+          btn.classList.add('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+        }
+      });
+    }
+
+    function updateFilterCount() {
+      const counts = {
+        all: aspirasiData.length,
+        pending: aspirasiData.filter(i => i.status === 'pending').length,
+        diproses: aspirasiData.filter(i => i.status === 'diproses').length,
+        selesai: aspirasiData.filter(i => i.status === 'selesai').length
+      };
+
+      document.getElementById('count-all').textContent = counts.all;
+      document.getElementById('count-pending').textContent = counts.pending;
+      document.getElementById('count-diproses').textContent = counts.diproses;
+      document.getElementById('count-selesai').textContent = counts.selesai;
+      
+      updateFilterButtons();
+    }
+
+    async function updateStatus(id, status) {
+      try {
+        const response = await fetch(`/api/aspirasi/${id}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+          alert(result.message);
+          fetchData();
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert('Gagal memperbarui status');
+      }
+    }
+
+    async function deleteAspirasi(id) {
+      if (!confirm('Apakah Anda yakin ingin menghapus aspirasi ini?')) return;
+      
+      try {
+        const response = await fetch(`/api/aspirasi/${id}`, {
+          method: 'DELETE'
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+          alert(result.message);
+          fetchData();
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert('Gagal menghapus data');
+      }
+    }
+
+    function toggleFilterSidebar() {
+      const sidebar = document.getElementById('filterSidebar');
+      sidebar.classList.toggle('hidden');
+      sidebar.classList.toggle('block');
+    }
+    
+    function filterStatus(status) {
+      currentFilter = status;
+      updateFilterButtons();
+      fetchData();
+    }
+    
+    function refreshData() {
+      fetchData();
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    checkAuth().then(auth => {
+      if (auth) fetchData();
+    });
+  </script>
+</body>
+</html>

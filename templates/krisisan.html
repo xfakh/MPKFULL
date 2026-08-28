@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Form aspirasi MPK MAS Assalafiyyah - Sampaikan kritik dan saran Anda">
+  <title>MPK MAS ASSALAFIYYAH — Form Aspirasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'mpk-primary': '#0f6b4f',
+            'mpk-primary-dark': '#074a31',
+            'mpk-primary-light': '#1a8c67',
+            'mpk-accent': '#ffd166',
+            'mpk-muted': '#6b7280',
+            'mpk-muted-dark': '#4b5563',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='krisismpk.css') }}">
+  <style>
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .animate-modalIn { animation: modalIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+    
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    
+    @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-slideUp { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    
+    .gender-overlay { background: linear-gradient(to bottom right, rgba(15, 107, 79, 0.95), rgba(7, 74, 49, 0.95)); }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fadeIn { animation: fadeIn 0.5s ease forwards; }
+    .animate-slideIn { animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 via-emerald-50/30 to-slate-50 min-h-screen font-sans">
+  <div class="max-w-6xl mx-auto px-6 py-12">
+    <div class="header-section text-center mb-12 animate-slideUp">
+      <div class="mb-6">
+        <img src="{{ url_for('static', filename='assets/mpkphotos.jpeg') }}" alt="Logo MPK MAS Assalafiyyah" class="w-20 h-20 mx-auto object-cover rounded-2xl shadow-2xl animate-float border-4 border-white">
+      </div>
+      <h1 class="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-mpk-primary to-mpk-primary-dark bg-clip-text text-transparent mb-4">Form Aspirasi MPK</h1>
+      <p class="text-mpk-muted text-sm">Sampaikan kritik, saran, dan aspirasi Anda secara langsung di halaman ini</p>
+    </div>
+
+    <div class="gender-selection bg-white rounded-3xl shadow-2xl border border-mpk-primary/10 p-8 md:p-12 mb-8 animate-slideIn">
+      <h2 class="text-2xl font-bold text-mpk-primary-dark mb-6 flex items-center gap-3">
+        <i class="fas fa-user-check text-mpk-primary text-2xl"></i>
+        <span>Pilih Gender</span>
+      </h2>
+      <div class="gender-buttons flex flex-col md:flex-row gap-6">
+        <button class="gender-btn putra group relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 text-white px-8 py-6 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex-1" onclick="selectGender('putra')">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div class="relative flex items-center justify-center gap-4">
+            <div class="w-14 h-14 flex-shrink-0">
+              <img src="{{ url_for('static', filename='assets/gambar-putra.png') }}" alt="Putra" class="w-full h-full object-contain drop-shadow-lg">
+            </div>
+            <div class="text-left">
+              <div class="font-extrabold text-xl">Putra</div>
+              <div class="text-sm font-normal opacity-90">Form Siswa Putra</div>
+            </div>
+          </div>
+        </button>
+        <button class="gender-btn putri group relative overflow-hidden bg-gradient-to-r from-pink-500 via-rose-400 to-pink-500 text-white px-8 py-6 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex-1" onclick="selectGender('putri')">
+          <div class="absolute inset-0 bg-gradient-to-r from-pink-600 via-rose-500 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div class="relative flex items-center justify-center gap-4">
+            <div class="w-14 h-14 flex-shrink-0">
+              <img src="{{ url_for('static', filename='assets/gambar-putri2.png') }}" alt="Putri" class="w-full h-full object-contain drop-shadow-lg">
+            </div>
+            <div class="text-left">
+              <div class="font-extrabold text-xl">Putri</div>
+              <div class="text-sm font-normal opacity-90">Form Siswi Putri</div>
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div id="aspirasiFormContainer" class="hidden form-section bg-white rounded-3xl shadow-2xl border border-mpk-primary/10 p-8 md:p-12 animate-slideIn">
+      <form id="aspirasiForm" class="space-y-6">
+        <input type="hidden" id="formGender" name="gender">
+        
+        <div class="header-form text-center mb-8">
+          <h2 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-mpk-primary to-mpk-primary-dark bg-clip-text text-transparent mb-3">Formulir Aspirasi</h2>
+          <p class="text-mpk-muted text-sm">Mohon isi semua data dengan benar</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="form-group">
+            <label class="block text-sm font-bold text-mpk-muted-dark mb-2">
+              <i class="fas fa-user text-mpk-primary mr-2"></i>Nama Lengkap <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="nama" name="nama" required class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none placeholder:text-slate-400 bg-slate-50 focus:bg-white" placeholder="Masukkan nama lengkap">
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-bold text-mpk-muted-dark mb-2">
+              <i class="fas fa-graduation-cap text-mpk-primary mr-2"></i>Kelas <span class="text-red-500">*</span>
+            </label>
+            <select id="kelas" name="kelas" required class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none bg-slate-50 focus:bg-white">
+              <option value="">Pilih Kelas</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-bold text-mpk-muted-dark mb-2">
+              <i class="fas fa-venus-mars text-mpk-primary mr-2"></i>Gender <span class="text-red-500">*</span>
+            </label>
+            <select id="gender" name="gender" required class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none bg-slate-50 focus:bg-white">
+              <option value="">Pilih Gender</option>
+              <option value="Putra">Putra</option>
+              <option value="Putri">Putri</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-bold text-mpk-muted-dark mb-2">
+              <i class="fas fa-tags text-mpk-primary mr-2"></i>Kategori Aspirasi <span class="text-red-500">*</span>
+            </label>
+            <select id="kategori" name="kategori" required class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none bg-slate-50 focus:bg-white">
+              <option value="">Pilih Kategori</option>
+              <option value="Akademik">Akademik</option>
+              <option value="Non-akademik">Non-akademik</option>
+              <option value="Fasilitas">Fasilitas</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="block text-sm font-bold text-mpk-muted-dark mb-2">
+            <i class="fas fa-comment-dots text-mpk-primary mr-2"></i>Deskripsi Aspirasi <span class="text-red-500">*</span>
+          </label>
+          <textarea id="deskripsi" name="deskripsi" rows="5" required class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none placeholder:text-slate-400 bg-slate-50 focus:bg-white" placeholder="Jelaskan aspirasi Anda secara detail..."></textarea>
+        </div>
+
+        <div class="form-actions flex flex-col md:flex-row gap-4 mt-8">
+          <button type="submit" class="submit-btn w-full md:w-auto bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-10 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+            <i class="fas fa-paper-plane"></i> Kirim Aspirasi
+          </button>
+          <button type="button" onclick="resetForm()" class="reset-btn w-full md:w-auto bg-gradient-to-r from-slate-100 via-white to-slate-100 text-mpk-muted-dark border border-slate-300 px-10 py-4 rounded-xl font-bold text-lg hover:bg-slate-200 hover:border-mpk-primary/30 hover:text-mpk-primary transition-all flex items-center justify-center gap-2">
+            <i class="fas fa-redo"></i> Reset Form
+          </button>
+        </div>
+
+        <p class="text-center text-xs text-slate-400 mt-6">
+          <i class="fas fa-info-circle mr-1"></i>
+          Data yang Anda kirimkan akan segera diproses oleh MPK dan menjadi dasar perbaikan madrasah
+        </p>
+      </form>
+    </div>
+
+    <div class="back-link mt-8 text-center">
+      <a href="{{ url_for('index') }}" class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-slate-100 via-white to-slate-100 text-mpk-muted-dark font-semibold text-base hover:border-mpk-primary/30 hover:text-mpk-primary hover:shadow-lg transition-all duration-300 group">
+        <i class="fas fa-arrow-left transition-transform duration-300 group-hover:-translate-x-2"></i>
+        <span>Kembali ke Beranda</span>
+      </a>
+    </div>
+  </div>
+
+  <div id="loadingModal" class="fixed inset-0 bg-gradient-to-br from-slate-900/80 via-slate-800/70 to-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="text-center bg-white rounded-2xl p-8 shadow-2xl">
+      <div class="animate-spin rounded-full h-16 w-16 border-4 border-mpk-primary border-t-transparent mx-auto mb-4"></div>
+      <p class="text-mpk-primary-dark font-semibold text-lg">Mengirim aspirasi...</p>
+      <p class="text-mpk-muted text-sm mt-2">Mohon tunggu sebentar</p>
+    </div>
+  </div>
+
+  <div id="successModal" class="fixed inset-0 bg-gradient-to-br from-emerald-900/90 via-emerald-800/80 to-emerald-900/90 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-3xl p-10 shadow-2xl max-w-sm w-full text-center animate-slideUp">
+      <div class="w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+        <i class="fas fa-check-circle text-5xl text-white"></i>
+      </div>
+      <h3 class="text-2xl font-extrabold text-mpk-primary-dark mb-2">Aspirasi Terkirim!</h3>
+      <p class="text-mpk-muted mb-6">Terima kasih telah menyampaikan aspirasi Anda. MPK akan segera memproses dan menindaklanjuti aspirasi Anda.</p>
+      <button onclick="closeSuccessModal()" class="w-full bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-8 py-4 rounded-xl font-bold text-base hover:shadow-lg transition-all hover:-translate-y-0.5">
+        <i class="fas fa-home mr-2"></i>Kembali ke Beranda
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let currentGender = null;
+
+    const kelasOptions = {
+      putra: ['10A', '10B', '11A', '11B', '12A', '12B'],
+      putri: ['10C', '10D', '10E', '11C', '11D', '11E', '12C', '12D', '12E']
+    };
+
+    function updateKelasOptions(gender) {
+      const kelasSelect = document.getElementById('kelas');
+      const options = kelasOptions[gender] || [];
+      
+      kelasSelect.innerHTML = '<option value="">Pilih Kelas</option>';
+      options.forEach(kelas => {
+        const option = document.createElement('option');
+        option.value = kelas;
+        option.textContent = kelas;
+        kelasSelect.appendChild(option);
+      });
+      
+      kelasSelect.value = '';
+    }
+
+    function selectGender(gender) {
+      currentGender = gender;
+      document.getElementById('formGender').value = gender;
+      document.getElementById('gender').value = gender === 'putra' ? 'Putra' : 'Putri';
+      
+      updateKelasOptions(gender);
+      
+      const buttons = document.querySelectorAll('.gender-btn');
+      buttons.forEach(btn => btn.classList.remove('ring-4', 'ring-mpk-primary', 'ring-offset-2'));
+      
+      const selectedBtn = document.querySelector(`.gender-btn.${gender}`);
+      if (selectedBtn) selectedBtn.classList.add('ring-4', 'ring-mpk-primary', 'ring-offset-2');
+      
+      const container = document.getElementById('aspirasiFormContainer');
+      container.classList.remove('hidden');
+      container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    document.getElementById('aspirasiForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      if (!currentGender) {
+        alert('Mohon pilih gender terlebih dahulu');
+        return;
+      }
+      
+      const nama = document.getElementById('nama').value.trim();
+      const kelas = document.getElementById('kelas').value;
+      const gender = document.getElementById('gender').value;
+      const kategori = document.getElementById('kategori').value;
+      const deskripsi = document.getElementById('deskripsi').value.trim();
+      
+      if (!nama || !kelas || !gender || !kategori || !deskripsi) {
+        alert('Semua field wajib diisi!');
+        return;
+      }
+      
+      const loadingModal = document.getElementById('loadingModal');
+      loadingModal.classList.remove('hidden');
+      
+      try {
+        const response = await fetch('/api/aspirasi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nama, kelas, gender, kategori, deskripsi })
+        });
+        
+        const result = await response.json();
+        
+        loadingModal.classList.add('hidden');
+        
+        if (result.success) {
+          console.log('Data aspirasi:', { nama, kelas, gender, kategori, deskripsi });
+          localStorage.setItem('mpk_last_aspirasi', JSON.stringify({ 
+            nama, kelas, gender, kategori, deskripsi,
+            timestamp: new Date().toISOString(),
+            id: result.id 
+          }));
+          
+          document.getElementById('successModal').classList.remove('hidden');
+          document.getElementById('aspirasiForm').reset();
+          currentGender = null;
+          document.querySelectorAll('.gender-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-mpk-primary', 'ring-offset-2'));
+          document.getElementById('aspirasiFormContainer').classList.add('hidden');
+        } else {
+          alert('Gagal mengirim aspirasi: ' + result.message);
+        }
+      } catch (error) {
+        loadingModal.classList.add('hidden');
+        alert('Terjadi kesalahan saat mengirim aspirasi: ' + error.message);
+        console.error('Error:', error);
+      }
+    });
+
+    function resetForm() {
+      document.getElementById('aspirasiForm').reset();
+      currentGender = null;
+      document.querySelectorAll('.gender-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-mpk-primary', 'ring-offset-2'));
+      
+      const kelasSelect = document.getElementById('kelas');
+      kelasSelect.innerHTML = '<option value="">Pilih Kelas</option>';
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('successModal').classList.add('hidden');
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>
