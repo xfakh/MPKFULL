@@ -229,7 +229,7 @@
 
     // Welcome Audio - Play on every page load
     (function() {
-      const welcomeAudio = new Audio('assets/audio/welcome.mp3');
+      const welcomeAudio = new Audio('{{ url_for("static", filename="assets/audio/welcome.mp3") }}');
       welcomeAudio.autoplay = true;
       
       function playAudio() {
