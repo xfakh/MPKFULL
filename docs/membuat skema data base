@@ -1,0 +1,3 @@
+Masalah utama yang kita hadapi saat ini adalah kita sudah berhasil membuat halaman pengiriman aspirasi internal (sehingga data tidak perlu lagi menumpang di platform pihak luar), tetapi kita belum bisa menyimpan data tersebut karena belum adanya sistem database.
+Meskipun ada banyak jenis database seperti MySQL, PostgreSQL, dan SQLite, kita akan menggunakan SQLite untuk membangun database pertama kita.
+Berikut adalah rencana rancangan skema database dan alur pengembangan aplikasinya:
