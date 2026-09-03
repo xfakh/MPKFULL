@@ -33,6 +33,10 @@ Sistem manajemen aspirasi siswa untuk MPK MAS Assalafiyyah menggunakan Flask fra
 ```
 MPKFULL/
 ├── app.py                 # Main Flask application
+├── wsgi.py                # Entry point gunicorn + init DB (production)
+├── Dockerfile             # Build image production
+├── docker-compose.yml     # Orkestrasi container Docker
+├── .dockerignore          # Exclude files dari build context
 ├── requirements.txt       # Python dependencies
 ├── .gitignore            # Git ignore rules
 ├── venv/                 # Virtual environment
@@ -46,6 +50,7 @@ MPKFULL/
 │   │   ├── picture/
 │   │   └── audio/
 │   └── krisismpk.css
+├── assets/              # Assets tambahan
 └── data/                # SQLite database
     └── aspirasi.db      # Database (auto-created)
 ```
@@ -112,11 +117,41 @@ Default admin - username: admin, password: admin123
 - **Login Admin:** http://127.0.0.1:5000/login
 - **Dashboard Admin:** http://127.0.0.1:5000/dashboard (perlu login)
 
+## 🐳 Menjalankan dengan Docker (Production)
+
+Aplikasi berjalan menggunakan **gunicorn** sebagai WSGI server production (bukan development server Flask).
+
+**Persyaratan:**
+- Docker
+- Docker Compose
+
+**Build & jalankan:**
+```bash
+docker compose up -d --build
+```
+
+**Perintah lain:**
+```bash
+docker compose ps          # Cek status container
+docker compose logs -f     # Lihat log aplikasi
+docker compose restart     # Restart aplikasi
+docker compose down        # Stop & hapus container
+```
+
+**Akses:**
+- Aplikasi: http://localhost:8080
+- Database tersimpan di folder `data/` (volume bind mount) sehingga **data tetap bertahan** meskipun container dihapus/rebuild
+
+**Catatan:**
+- Port host `8080` dipetakan ke port container `5000` (ubah di `docker-compose.yml` jika perlu)
+- Init database & pembuatan admin default otomatis dijalankan saat container start (via `wsgi.py`)
+- Container menggunakan `restart: unless-stopped` dan dilengkapi healthcheck
+
 ## 🔐 Kredensial Admin Default
 
 ```
 Username: admin
-Password: admin123
+Password: mpkassalafiyyah
 ```
 
 ⚠️ **PENTING:** Ganti password default setelah deployment!
@@ -142,6 +177,7 @@ Password: admin123
 flask==3.1.3
 flask-sqlalchemy==3.1.1
 flask-login==0.6.3
+gunicorn==23.0.0
 ```
 
 Install dengan:
@@ -186,7 +222,7 @@ CREATE TABLE admin (
 
 ### 2. Test Dashboard Admin
 1. Buka http://127.0.0.1:5000/login
-2. Login dengan `admin` / `admin123`
+2. Login dengan `admin` / `mpkassalafiyyah`
 3. Lihat data aspirasi di dashboard
 4. Test filter status
 5. Test update status & delete
@@ -250,15 +286,15 @@ Sebelum deploy ke production:
 app.config['SECRET_KEY'] = 'your-random-secret-key-here'
 ```
 
-2. **Nonaktifkan Debug Mode:**
-```python
-app.run(debug=False, port=5000)
-```
-
-3. **Gunakan Production Server:**
+2. **Gunakan Docker (Direkomendasikan):**
 ```bash
-pip install gunicorn
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
+docker compose up -d --build
+```
+Gunicorn sudah berjalan otomatis di dalam container, debug mode tidak aktif.
+
+3. **Atau Gunakan Gunicorn Manual (tanpa Docker):**
+```bash
+gunicorn -w 1 --threads 4 -b 0.0.0.0:5000 wsgi:app
 ```
 
 4. **Ganti Password Admin Default**
@@ -336,6 +372,13 @@ sudo systemctl enable mpk
 ```
 
 ## 📝 Changelog
+
+### Version 2.1 (2026-09-03)
+- ✅ Dockerfile & docker-compose untuk build production
+- ✅ Gunicorn sebagai WSGI server production
+- ✅ wsgi.py sebagai entry point + auto init DB
+- ✅ Persistensi database via volume bind mount
+- ✅ Healthcheck & restart policy pada container
 
 ### Version 2.0 (2026-08-28)
 - ✅ Migrasi dari PHP ke Flask framework
