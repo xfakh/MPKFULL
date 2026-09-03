@@ -43,7 +43,7 @@ def load_user(user_id):
 
 def create_default_admin():
     if Admin.query.count() == 0:
-        hashed_password = generate_password_hash('admin123', method='pbkdf2:sha256')
+        hashed_password = generate_password_hash('mpkassalafiyyah', method='pbkdf2:sha256')
         admin = Admin(username='admin', password=hashed_password)
         db.session.add(admin)
         db.session.commit()
@@ -117,8 +117,9 @@ def save_aspirasi():
     })
 
 @app.route('/api/aspirasi', methods=['GET'])
-@login_required
 def get_aspirasi():
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'message': 'Tidak terautentikasi', 'authenticated': False}), 401
     status_filter = request.args.get('status')
     kelas_filter = request.args.get('kelas')
     kategori_filter = request.args.get('kategori')
@@ -150,8 +151,10 @@ def get_aspirasi():
     return jsonify({'success': True, 'data': data, 'count': len(data)})
 
 @app.route('/api/aspirasi/<int:id>/status', methods=['PUT'])
-@login_required
 def update_status(id):
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'message': 'Tidak terautentikasi', 'authenticated': False}), 401
+    
     data = request.get_json()
     
     if not data or 'status' not in data:
@@ -171,8 +174,10 @@ def update_status(id):
     return jsonify({'success': True, 'message': 'Status berhasil diupdate'})
 
 @app.route('/api/aspirasi/<int:id>', methods=['DELETE'])
-@login_required
 def delete_aspirasi(id):
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'message': 'Tidak terautentikasi', 'authenticated': False}), 401
+    
     aspirasi = Aspirasi.query.get(id)
     
     if not aspirasi:
@@ -206,6 +211,6 @@ if __name__ == '__main__':
         db.create_all()
         create_default_admin()
         print(f"Database created at: {db_path}")
-        print("Default admin - username: admin, password: admin123")
+        print("Default admin - username: admin, password: mpkassalafiyyah")
     
     app.run(debug=True, port=5000)

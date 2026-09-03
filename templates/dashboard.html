@@ -27,103 +27,168 @@
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-emerald-50/30 to-slate-50 min-h-screen">
-  <div class="max-w-7xl mx-auto px-6 py-8">
-    <header class="mb-8 animate-slideUp">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-extrabold text-mpk-primary-dark mb-2">Dashboard Admin MPK</h1>
-          <p class="text-mpk-muted">Manajemen Aspirasi Siswa</p>
-        </div>
-        <div class="flex items-center gap-3">
-          <div class="text-right">
-            <p class="text-sm text-mpk-muted">Admin: <span id="adminUsername" class="font-semibold text-mpk-primary">-</span></p>
-            <p class="text-sm text-mpk-muted">Total Aspirasi: <span id="totalCount" class="font-bold text-mpk-primary">0</span></p>
+  <div class="flex">
+    <aside id="mainSidebar" class="fixed left-0 top-0 h-screen w-72 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform transition-transform duration-300 sidebar-nav">
+      <div class="p-6 border-b border-slate-700/50">
+        <div class="flex items-center gap-4">
+          <img src="{{ url_for('static', filename='assets/mpkphotos.jpeg') }}" alt="Logo MPK" class="w-12 h-12 rounded-xl object-cover shadow-lg">
+          <div>
+            <div class="font-bold text-lg bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">MPK Admin</div>
+            <div class="text-xs text-slate-400">Dashboard Panel</div>
           </div>
-          <button onclick="refreshData()" class="bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all">
-            <i class="fas fa-sync-alt mr-2"></i>Refresh
-          </button>
-          <button onclick="logout()" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all">
-            <i class="fas fa-sign-out-alt mr-2"></i>Logout
-          </button>
         </div>
       </div>
-    </header>
 
-    <div class="flex flex-col md:flex-row gap-8">
-      <!-- FILTER SIDEBAR (Toggle) -->
-      <div id="filterSidebar" class="w-full md:w-64 bg-white rounded-2xl shadow-lg border border-mpk-primary/10 p-6 animate-slideUp hidden md:block">
-        <div class="mb-6">
-          <h3 class="text-lg font-bold text-mpk-primary-dark mb-4 flex items-center gap-2">
-            <i class="fas fa-filter text-mpk-primary"></i> Filter
-          </h3>
-          
-          <div class="space-y-4">
-            <!-- Filter Kelas -->
-            <div>
-              <label class="block text-sm font-semibold text-mpk-muted-dark mb-2">Kelas</label>
-              <select id="filterKelas" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none bg-white">
-                <option value="">Semua Kelas</option>
-                <option value="10A">10A</option>
-                <option value="10B">10B</option>
-                <option value="10C">10C</option>
-                <option value="10D">10D</option>
-                <option value="10E">10E</option>
-                <option value="11A">11A</option>
-                <option value="11B">11B</option>
-                <option value="11C">11C</option>
-                <option value="11D">11D</option>
-                <option value="11E">11E</option>
-                <option value="12A">12A</option>
-                <option value="12B">12B</option>
-                <option value="12C">12C</option>
-                <option value="12D">12D</option>
-                <option value="12E">12E</option>
-              </select>
-            </div>
-            
-            <!-- Filter Kategori -->
-            <div>
-              <label class="block text-sm font-semibold text-mpk-muted-dark mb-2">Kategori</label>
-              <select id="filterKategori" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none bg-white">
-                <option value="">Semua Kategori</option>
-                <option value="Akademik">Akademik</option>
-                <option value="Non-akademik">Non-akademik</option>
-                <option value="Fasilitas">Fasilitas</option>
-                <option value="Lainnya">Lainnya</option>
-              </select>
-            </div>
-            
-            <button onclick="applyFilters()" class="w-full bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2">
-              <i class="fas fa-check"></i> Terapkan Filter
-            </button>
-          </div>
-        </div>
+      <nav class="p-4 space-y-1">
+        <div class="text-xs uppercase text-slate-500 font-bold mb-3 px-4">Menu Utama</div>
         
-        <!-- Status Filter -->
-        <div>
-          <h3 class="text-lg font-bold text-mpk-primary-dark mb-4 flex items-center gap-2">
-            <i class="fas fa-tasks text-mpk-primary"></i> Status
-          </h3>
+        <a href="{{ url_for('dashboard') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white font-semibold shadow-md">
+          <i class="fas fa-home text-lg"></i>
+          <span>Dashboard</span>
+        </a>
+        
+        <a href="{{ url_for('index') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 hover:text-white font-medium">
+          <i class="fas fa-globe text-lg"></i>
+          <span>Website Utama</span>
+        </a>
+        
+        <a href="{{ url_for('krisisan') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 hover:text-white font-medium">
+          <i class="fas fa-edit text-lg"></i>
+          <span>Form Aspirasi</span>
+        </a>
+      </nav>
+
+      <div class="p-4 border-t border-slate-700/50">
+        <div class="text-xs uppercase text-slate-500 font-bold mb-3 px-4">Informasi</div>
+        
+        <div class="bg-slate-800/50 rounded-xl p-4 space-y-3">
+          <div class="flex items-center gap-3 text-slate-300">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 flex items-center justify-center">
+              <i class="fas fa-user text-emerald-400"></i>
+            </div>
+            <div>
+              <div class="text-xs text-slate-400">Admin</div>
+              <div id="sidebarAdminName" class="text-sm font-semibold text-white">-</div>
+            </div>
+          </div>
           
-          <div class="space-y-2">
-            <button onclick="filterStatus('all')" id="btn-all" class="w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white">
-              <i class="fas fa-list mr-2"></i>Semua (<span id="count-all">0</span>)
-            </button>
-            <button onclick="filterStatus('pending')" id="btn-pending" class="w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-              <i class="fas fa-clock mr-2"></i>Belum Diproses (<span id="count-pending">0</span>)
-            </button>
-            <button onclick="filterStatus('diproses')" id="btn-diproses" class="w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-              <i class="fas fa-hourglass-half mr-2"></i>Diproses (<span id="count-diproses">0</span>)
-            </button>
-            <button onclick="filterStatus('selesai')" id="btn-selesai" class="w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-              <i class="fas fa-check-circle mr-2"></i>Selesai (<span id="count-selesai">0</span>)
-            </button>
+          <div class="flex items-center gap-3 text-slate-300">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center">
+              <i class="fas fa-inbox text-blue-400"></i>
+            </div>
+            <div>
+              <div class="text-xs text-slate-400">Total Aspirasi</div>
+              <div id="sidebarTotalAspirasi" class="text-sm font-semibold text-white">0</div>
+            </div>
           </div>
         </div>
       </div>
-      
-      <!-- TABEL ASPIRASI -->
-      <div class="flex-1 bg-white rounded-2xl shadow-lg border border-mpk-primary/10 overflow-hidden animate-fadeIn">
+
+      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700/50">
+        <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-red-500/20 to-red-600/20 text-red-400 hover:from-red-500/30 hover:to-red-600/30 font-medium transition-all">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="ml-72 flex-1">
+      <div class="px-6 py-8">
+        <header class="mb-8 animate-slideUp">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h1 class="text-3xl font-extrabold text-mpk-primary-dark mb-2">Dashboard Admin MPK</h1>
+              <p class="text-mpk-muted">Manajemen Aspirasi Siswa</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="refreshData()" class="bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all">
+                <i class="fas fa-sync-alt mr-2"></i>Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-lg border border-mpk-primary/10 p-4">
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-filter text-mpk-primary"></i>
+                <span class="font-semibold text-mpk-primary-dark text-sm">Filter:</span>
+              </div>
+
+              <div class="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
+                <i class="fas fa-layer-group text-mpk-muted text-sm"></i>
+                <select id="filterStatus" onchange="quickFilterStatus(this.value)" class="bg-transparent text-sm font-medium text-slate-700 outline-none cursor-pointer">
+                  <option value="all">Semua Status</option>
+                  <option value="pending">Belum Diproses</option>
+                  <option value="diproses">Sedang Diproses</option>
+                  <option value="selesai">Selesai</option>
+                </select>
+              </div>
+
+              <div class="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
+                <i class="fas fa-graduation-cap text-mpk-muted text-sm"></i>
+                <select id="filterKelas" onchange="applyFilters()" class="bg-transparent text-sm font-medium text-slate-700 outline-none cursor-pointer">
+                  <option value="">Semua Kelas</option>
+                  <option value="10A">10A</option>
+                  <option value="10B">10B</option>
+                  <option value="10C">10C</option>
+                  <option value="10D">10D</option>
+                  <option value="10E">10E</option>
+                  <option value="11A">11A</option>
+                  <option value="11B">11B</option>
+                  <option value="11C">11C</option>
+                  <option value="11D">11D</option>
+                  <option value="11E">11E</option>
+                  <option value="12A">12A</option>
+                  <option value="12B">12B</option>
+                  <option value="12C">12C</option>
+                  <option value="12D">12D</option>
+                  <option value="12E">12E</option>
+                </select>
+              </div>
+
+              <div class="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
+                <i class="fas fa-tags text-mpk-muted text-sm"></i>
+                <select id="filterKategori" onchange="applyFilters()" class="bg-transparent text-sm font-medium text-slate-700 outline-none cursor-pointer">
+                  <option value="">Semua Kategori</option>
+                  <option value="Akademik">Akademik</option>
+                  <option value="Non-akademik">Non-akademik</option>
+                  <option value="Fasilitas">Fasilitas</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+
+              <div class="flex items-center gap-2 ml-auto">
+                <div class="flex items-center gap-2 px-3 py-2 bg-emerald-50 rounded-lg border border-emerald-200">
+                  <i class="fas fa-chart-bar text-emerald-600 text-sm"></i>
+                  <span class="text-xs font-semibold text-emerald-700">Total: <span id="totalAspirasi">0</span></span>
+                </div>
+                <button onclick="resetFilters()" class="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-300 transition-all text-sm font-medium text-slate-600">
+                  <i class="fas fa-redo text-xs"></i>
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            <div id="statusChips" class="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+              <span class="text-xs font-semibold text-mpk-muted uppercase">Quick Status:</span>
+              <button onclick="filterStatus('all')" id="chip-all" class="chip-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white shadow-md">
+                <i class="fas fa-list mr-1"></i>Semua (<span id="count-all">0</span>)
+              </button>
+              <button onclick="filterStatus('pending')" id="chip-pending" class="chip-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-600">
+                <i class="fas fa-clock mr-1"></i>Pending (<span id="count-pending">0</span>)
+              </button>
+              <button onclick="filterStatus('diproses')" id="chip-diproses" class="chip-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-yellow-100 hover:text-yellow-600">
+                <i class="fas fa-hourglass-half mr-1"></i>Diproses (<span id="count-diproses">0</span>)
+              </button>
+              <button onclick="filterStatus('selesai')" id="chip-selesai" class="chip-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-600">
+                <i class="fas fa-check-circle mr-1"></i>Selesai (<span id="count-selesai">0</span>)
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div class="flex flex-col gap-8">
+          <div class="flex-1 bg-white rounded-2xl shadow-lg border border-mpk-primary/10 overflow-hidden animate-fadeIn">
         <div class="border-b border-slate-200 p-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -159,20 +224,22 @@
           </table>
         </div>
 
-        <div id="emptyState" class="hidden p-12 text-center">
-          <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-inbox text-4xl text-slate-400"></i>
+            <div id="emptyState" class="hidden p-12 text-center">
+              <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-inbox text-4xl text-slate-400"></i>
+              </div>
+              <p class="text-slate-500 text-lg">Belum ada aspirasi</p>
+              <p class="text-sm text-slate-400 mt-2">Coba ubah filter atau reset filter untuk menampilkan semua data</p>
+            </div>
           </div>
-          <p class="text-slate-500 text-lg">Belum ada aspirasi</p>
-          <p class="text-sm text-slate-400 mt-2">Coba ubah filter atau reset filter untuk menampilkan semua data</p>
+        </div>
+
+        <div id="authWarning" class="mt-8 text-center text-sm text-slate-400 hidden">
+          <i class="fas fa-lock mr-2"></i>
+          Anda perlu login untuk mengakses halaman ini.
+          <a href="{{ url_for('login') }}" class="text-mpk-primary hover:underline ml-1">Login disini</a>
         </div>
       </div>
-    </div>
-
-    <div id="authWarning" class="mt-8 text-center text-sm text-slate-400 hidden">
-      <i class="fas fa-lock mr-2"></i>
-      Anda perlu login untuk mengakses halaman ini.
-      <a href="{{ url_for('login') }}" class="text-mpk-primary hover:underline ml-1">Login disini</a>
     </div>
   </div>
 
@@ -190,7 +257,8 @@
         
         if (result.authenticated) {
           isAuthenticated = true;
-          document.getElementById('adminUsername').textContent = result.admin.username;
+          document.getElementById('sidebarAdminName').textContent = result.admin.username;
+          document.getElementById('sidebarTotalAspirasi').textContent = '0';
           document.getElementById('authWarning').classList.add('hidden');
           return true;
         } else {
@@ -217,41 +285,69 @@
 
     async function fetchData() {
       try {
-        let url = '/api/aspirasi?';
+        let url = '/api/aspirasi';
+        const params = new URLSearchParams();
         
         if (currentFilter && currentFilter !== 'all') {
-          url += `status=${currentFilter}&`;
+          params.append('status', currentFilter);
         }
         
         if (currentKelas) {
-          url += `kelas=${currentKelas}&`;
+          params.append('kelas', currentKelas);
         }
         
         if (currentKategori) {
-          url += `kategori=${currentKategori}&`;
+          params.append('kategori', currentKategori);
         }
         
-        url = url.slice(0, -1);
+        const queryString = params.toString();
+        if (queryString) {
+          url += '?' + queryString;
+        }
         
         const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const result = await response.json();
         
         if (result.success) {
           aspirasiData = result.data;
           renderTable();
           updateFilterInfo();
+          updateFilterCount();
+        } else {
+          throw new Error(result.message || 'API request failed');
         }
       } catch (error) {
         console.error('Error fetching data:', error);
         document.getElementById('aspirasiTable').innerHTML = 
-          '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Gagal memuat data. Pastikan API tersedia.</td></tr>';
+          `<tr><td colspan="7" class="px-6 py-4 text-center text-red-500"><i class="fas fa-exclamation-circle mr-2"></i>Gagal memuat data: ${error.message}</td></tr>`;
+      }
+    }
+    
+    function quickFilterStatus(status) {
+      currentFilter = status;
+      updateFilterChips();
+      fetchData();
+    }
+    
+    function updateFilterChips() {
+      document.querySelectorAll('.chip-btn').forEach(chip => {
+        chip.classList.remove('active');
+      });
+      
+      const activeChip = document.getElementById(`chip-${currentFilter}`);
+      if (activeChip) {
+        activeChip.classList.add('active');
       }
     }
 
     function renderTable() {
       const tbody = document.getElementById('aspirasiTable');
       const emptyState = document.getElementById('emptyState');
-      const totalCount = document.getElementById('totalCount');
       
       let filteredData = aspirasiData;
       
@@ -259,7 +355,7 @@
         filteredData = aspirasiData.filter(item => item.status === currentFilter);
       }
       
-      totalCount.textContent = aspirasiData.length;
+      document.getElementById('sidebarTotalAspirasi').textContent = aspirasiData.length;
       
       if (filteredData.length === 0) {
         emptyState.classList.remove('hidden');
@@ -334,10 +430,11 @@
       currentKelas = '';
       currentKategori = '';
       
+      document.getElementById('filterStatus').value = 'all';
       document.getElementById('filterKelas').value = '';
       document.getElementById('filterKategori').value = '';
       
-      updateFilterButtons();
+      updateFilterChips();
       fetchData();
     }
     
@@ -390,8 +487,7 @@
       document.getElementById('count-pending').textContent = counts.pending;
       document.getElementById('count-diproses').textContent = counts.diproses;
       document.getElementById('count-selesai').textContent = counts.selesai;
-      
-      updateFilterButtons();
+      document.getElementById('totalAspirasi').textContent = aspirasiData.length;
     }
 
     async function updateStatus(id, status) {
