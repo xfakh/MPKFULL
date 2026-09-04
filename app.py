@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from functools import wraps
 import os
 
 app = Flask(__name__)
@@ -25,6 +26,7 @@ class Admin(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    role = db.Column(db.String(20), default='staff')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Aspirasi(db.Model):
@@ -41,10 +43,18 @@ class Aspirasi(db.Model):
 def load_user(user_id):
     return Admin.query.get(int(user_id))
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role != 'admin':
+            return jsonify({'success': False, 'message': 'Akses ditolak. Hanya admin yang dapat melakukan ini.'}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
 def create_default_admin():
     if Admin.query.count() == 0:
         hashed_password = generate_password_hash('mpkassalafiyyah', method='pbkdf2:sha256')
-        admin = Admin(username='admin', password=hashed_password)
+        admin = Admin(username='admin', password=hashed_password, role='admin')
         db.session.add(admin)
         db.session.commit()
 
@@ -196,7 +206,8 @@ def check_auth():
             'authenticated': True,
             'admin': {
                 'id': current_user.id,
-                'username': current_user.username
+                'username': current_user.username,
+                'role': current_user.role
             }
         })
     else:
@@ -213,12 +224,14 @@ def get_admin_users():
     data = [{
         'id': u.id,
         'username': u.username,
+        'role': u.role,
         'created_at': u.created_at.strftime('%Y-%m-%d %H:%M:%S')
     } for u in users]
     return jsonify({'success': True, 'data': data})
 
 @app.route('/api/admin/users', methods=['POST'])
 @login_required
+@admin_required
 def create_admin_user():
     data = request.get_json()
     
@@ -229,7 +242,9 @@ def create_admin_user():
         return jsonify({'success': False, 'message': 'Username sudah digunakan'}), 400
     
     hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
-    new_admin = Admin(username=data['username'], password=hashed_password)
+    role = data.get('role', 'staff')
+    
+    new_admin = Admin(username=data['username'], password=hashed_password, role=role)
     
     db.session.add(new_admin)
     db.session.commit()
@@ -239,12 +254,14 @@ def create_admin_user():
         'message': 'User berhasil ditambahkan',
         'user': {
             'id': new_admin.id,
-            'username': new_admin.username
+            'username': new_admin.username,
+            'role': new_admin.role
         }
     })
 
 @app.route('/api/admin/users/<int:id>', methods=['DELETE'])
 @login_required
+@admin_required
 def delete_admin_user(id):
     if current_user.id == id:
         return jsonify({'success': False, 'message': 'Tidak dapat menghapus akun sendiri'}), 400
@@ -261,6 +278,7 @@ def delete_admin_user(id):
 
 @app.route('/api/admin/users/<int:id>/reset-password', methods=['PUT'])
 @login_required
+@admin_required
 def reset_admin_password(id):
     data = request.get_json()
     

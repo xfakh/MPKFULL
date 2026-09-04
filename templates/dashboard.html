@@ -94,7 +94,7 @@
           <span>Form Aspirasi</span>
         </a>
         
-        <button type="button" onclick="showUserManagement()" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 hover:text-white font-medium w-full text-left">
+        <button type="button" id="manajemenUserBtn" onclick="showUserManagement()" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 hover:text-white font-medium w-full text-left hidden">
           <i class="fas fa-users text-lg"></i>
           <span>Manajemen User</span>
         </button>
@@ -305,7 +305,7 @@
                   <h3 class="text-lg font-bold text-mpk-primary-dark">Manajemen User Admin</h3>
                   <p class="text-sm text-mpk-muted mt-1">Kelola akun admin</p>
                 </div>
-                <button onclick="showAddUserModal()" class="bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:shadow-lg transition-all flex items-center gap-2">
+                <button id="addUserBtn" onclick="showAddUserModal()" class="hidden bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:shadow-lg transition-all flex items-center gap-2">
                   <i class="fas fa-plus"></i>
                   <span>Tambah User</span>
                 </button>
@@ -346,14 +346,20 @@
     let currentKategori = '';
     let isAuthenticated = false;
     let currentUserId = 0;
+    let currentUserRole = '';
     
     function showUserManagement() {
       console.log('showUserManagement called');
       const aspirasiSection = document.getElementById('aspirasiSection');
       const userSection = document.getElementById('userManagementSection');
+      const addUserBtn = document.getElementById('addUserBtn');
       
       if (aspirasiSection) aspirasiSection.classList.add('hidden');
       if (userSection) userSection.classList.remove('hidden');
+      
+      if (currentUserRole === 'admin' && addUserBtn) {
+        addUserBtn.classList.remove('hidden');
+      }
       
       loadUsers();
     }
@@ -448,10 +454,15 @@
         if (result.authenticated) {
           isAuthenticated = true;
           currentUserId = result.admin.id;
+          currentUserRole = result.admin.role;
           document.getElementById('sidebarAdminName').textContent = result.admin.username;
           document.getElementById('sidebarTotalAspirasi').textContent = '0';
           document.getElementById('authWarning').classList.add('hidden');
           loadTheme();
+          
+          if (currentUserRole === 'admin') {
+            document.getElementById('manajemenUserBtn').classList.remove('hidden');
+          }
           return true;
         } else {
           window.location.href = '/login';
@@ -818,12 +829,18 @@
               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-mpk-primary to-mpk-primary-dark flex items-center justify-center">
                 <i class="fas fa-user text-white"></i>
               </div>
-              <div class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(user.username)}</div>
+              <div>
+                <div class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(user.username)}</div>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${user.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400'}">
+                  ${user.role === 'admin' ? 'Admin' : 'Staff'}
+                </span>
+              </div>
             </div>
           </td>
           <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">${escapeHtml(user.created_at)}</td>
           <td class="px-6 py-4">
             <div class="flex gap-2 justify-center">
+              ${currentUserRole === 'admin' ? `
               <button onclick="showResetPasswordModal(${user.id}, '${escapeHtml(user.username)}')" class="text-mpk-accent hover:text-mpk-primary-dark transition-colors" title="Reset Password">
                 <i class="fas fa-key text-lg"></i>
               </button>
@@ -832,6 +849,7 @@
                 <i class="fas fa-trash text-lg"></i>
               </button>
               ` : '<span class="text-slate-400 text-xs">(Akun Anda)</span>'}
+              ` : '<span class="text-slate-400 text-xs">-</span>'}
             </div>
           </td>
         </tr>
@@ -845,15 +863,16 @@
       const password = prompt('Masukkan password:');
       if (!password) return;
       
-      addUser(username, password);
+      const role = currentUserRole === 'admin' ? 'staff' : 'staff';
+      addUser(username, password, role);
     }
 
-    async function addUser(username, password) {
+    async function addUser(username, password, role) {
       try {
         const response = await fetch('/api/admin/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+          body: JSON.stringify({ username, password, role })
         });
         
         const result = await response.json();
