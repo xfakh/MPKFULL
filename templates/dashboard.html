@@ -79,10 +79,10 @@
       <nav class="p-4 space-y-1">
         <div class="text-xs uppercase text-slate-500 font-bold mb-3 px-4">Menu Utama</div>
         
-        <a href="{{ url_for('dashboard') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white font-semibold shadow-md">
+        <button type="button" onclick="showAspirasi()" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white font-semibold shadow-md w-full text-left">
           <i class="fas fa-home text-lg"></i>
           <span>Dashboard</span>
-        </a>
+        </button>
         
         <a href="{{ url_for('index') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 hover:text-white font-medium">
           <i class="fas fa-globe text-lg"></i>
@@ -93,6 +93,11 @@
           <i class="fas fa-edit text-lg"></i>
           <span>Form Aspirasi</span>
         </a>
+        
+        <button type="button" onclick="showUserManagement()" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 hover:text-white font-medium w-full text-left">
+          <i class="fas fa-users text-lg"></i>
+          <span>Manajemen User</span>
+        </button>
       </nav>
 
       <div class="p-4 border-t border-slate-700/50">
@@ -239,7 +244,7 @@
         </header>
 
         <div class="flex flex-col gap-8">
-          <div class="flex-1 bg-white rounded-2xl shadow-lg border border-mpk-primary/10 overflow-hidden animate-fadeIn">
+          <div id="aspirasiSection" class="flex-1 bg-white rounded-2xl shadow-lg border border-mpk-primary/10 overflow-hidden animate-fadeIn">
         <div class="border-b border-slate-200 p-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -290,9 +295,46 @@
           <i class="fas fa-lock mr-2"></i>
           Anda perlu login untuk mengakses halaman ini.
           <a href="{{ url_for('login') }}" class="text-mpk-primary hover:underline ml-1">Login disini</a>
+            </div>
+          </div>
+          
+          <div id="userManagementSection" class="hidden flex-1 bg-white rounded-2xl shadow-lg border border-mpk-primary/10 overflow-hidden animate-fadeIn">
+            <div class="border-b border-slate-200 p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-bold text-mpk-primary-dark">Manajemen User Admin</h3>
+                  <p class="text-sm text-mpk-muted mt-1">Kelola akun admin</p>
+                </div>
+                <button onclick="showAddUserModal()" class="bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:shadow-lg transition-all flex items-center gap-2">
+                  <i class="fas fa-plus"></i>
+                  <span>Tambah User</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gradient-to-r from-mpk-primary to-mpk-primary-dark sticky top-0 z-10">
+                  <tr>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider border-b-2 border-white/20">No</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider border-b-2 border-white/20">Username</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider border-b-2 border-white/20">Dibuat</th>
+                    <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase tracking-wider border-b-2 border-white/20">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="userTable" class="divide-y divide-slate-200">
+                </tbody>
+              </table>
+            </div>
+
+            <div id="emptyUserState" class="hidden p-12 text-center">
+              <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-users text-4xl text-slate-400"></i>
+              </div>
+              <p class="text-slate-500 text-lg">Belum ada user</p>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
   </div>
 
   <div id="toastContainer" class="toast-container"></div>
@@ -303,6 +345,27 @@
     let currentKelas = '';
     let currentKategori = '';
     let isAuthenticated = false;
+    let currentUserId = 0;
+    
+    function showUserManagement() {
+      console.log('showUserManagement called');
+      const aspirasiSection = document.getElementById('aspirasiSection');
+      const userSection = document.getElementById('userManagementSection');
+      
+      if (aspirasiSection) aspirasiSection.classList.add('hidden');
+      if (userSection) userSection.classList.remove('hidden');
+      
+      loadUsers();
+    }
+
+    function showAspirasi() {
+      console.log('showAspirasi called');
+      const aspirasiSection = document.getElementById('aspirasiSection');
+      const userSection = document.getElementById('userManagementSection');
+      
+      if (userSection) userSection.classList.add('hidden');
+      if (aspirasiSection) aspirasiSection.classList.remove('hidden');
+    }
     
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
@@ -362,41 +425,29 @@
       }
     }
     
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i><span>${message}</span>`;
-      container.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.style.animation = 'slideIn 0.3s ease reverse';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
-    
     function showSkeleton() {
-      const tbody = document.getElementById('aspirasiTable');
-      tbody.innerHTML = `
-        <tr><td colspan="7" class="p-4">
-          <div class="animate-skeleton h-4 bg-slate-200 dark:bg-slate-700 rounded mb-2 w-full"></div>
-        </td></tr>
-        <tr><td colspan="7" class="p-4">
-          <div class="animate-skeleton h-4 bg-slate-200 dark:bg-slate-700 rounded mb-2 w-full"></div>
-        </td></tr>
-        <tr><td colspan="7" class="p-4">
-          <div class="animate-skeleton h-4 bg-slate-200 dark:bg-slate-700 rounded mb-2 w-full"></div>
-        </td></tr>
-      `;
-    }
-
-    async function checkAuth() {
+       const tbody = document.getElementById('aspirasiTable');
+       tbody.innerHTML = `
+         <tr><td colspan="7" class="p-4">
+           <div class="animate-skeleton h-4 bg-slate-200 dark:bg-slate-700 rounded mb-2 w-full"></div>
+         </td></tr>
+         <tr><td colspan="7" class="p-4">
+           <div class="animate-skeleton h-4 bg-slate-200 dark:bg-slate-700 rounded mb-2 w-full"></div>
+         </td></tr>
+         <tr><td colspan="7" class="p-4">
+           <div class="animate-skeleton h-4 bg-slate-200 dark:bg-slate-700 rounded mb-2 w-full"></div>
+         </td></tr>
+       `;
+     }
+     
+     async function checkAuth() {
       try {
         const response = await fetch('/api/check-auth');
         const result = await response.json();
         
         if (result.authenticated) {
           isAuthenticated = true;
+          currentUserId = result.admin.id;
           document.getElementById('sidebarAdminName').textContent = result.admin.username;
           document.getElementById('sidebarTotalAspirasi').textContent = '0';
           document.getElementById('authWarning').classList.add('hidden');
@@ -731,7 +782,141 @@
       const sidebar = document.getElementById('mainSidebar');
       sidebar.classList.toggle('-translate-x-full');
     }
-    
+
+    async function loadUsers() {
+      try {
+        const response = await fetch('/api/admin/users');
+        const result = await response.json();
+        
+        if (result.success) {
+          renderUserTable(result.data);
+        } else {
+          showToast('Gagal memuat data user', 'error');
+        }
+      } catch (error) {
+        showToast('Gagal memuat data user', 'error');
+      }
+    }
+
+    function renderUserTable(users) {
+      const tbody = document.getElementById('userTable');
+      const emptyState = document.getElementById('emptyUserState');
+      
+      if (users.length === 0) {
+        emptyState.classList.remove('hidden');
+        tbody.innerHTML = '';
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      
+      tbody.innerHTML = users.map((user, index) => `
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">${index + 1}</td>
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-mpk-primary to-mpk-primary-dark flex items-center justify-center">
+                <i class="fas fa-user text-white"></i>
+              </div>
+              <div class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(user.username)}</div>
+            </div>
+          </td>
+          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">${escapeHtml(user.created_at)}</td>
+          <td class="px-6 py-4">
+            <div class="flex gap-2 justify-center">
+              <button onclick="showResetPasswordModal(${user.id}, '${escapeHtml(user.username)}')" class="text-mpk-accent hover:text-mpk-primary-dark transition-colors" title="Reset Password">
+                <i class="fas fa-key text-lg"></i>
+              </button>
+              ${user.id !== currentUserId ? `
+              <button onclick="deleteUser(${user.id}, '${escapeHtml(user.username)}')" class="text-red-500 hover:text-red-700 transition-colors" title="Hapus User">
+                <i class="fas fa-trash text-lg"></i>
+              </button>
+              ` : '<span class="text-slate-400 text-xs">(Akun Anda)</span>'}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function showAddUserModal() {
+      const username = prompt('Masukkan username baru:');
+      if (!username) return;
+      
+      const password = prompt('Masukkan password:');
+      if (!password) return;
+      
+      addUser(username, password);
+    }
+
+    async function addUser(username, password) {
+      try {
+        const response = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('User berhasil ditambahkan', 'success');
+          loadUsers();
+        } else {
+          showToast(result.message, 'error');
+        }
+      } catch (error) {
+        showToast('Gagal menambahkan user', 'error');
+      }
+    }
+
+    async function deleteUser(id, username) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus user "${username}"?`)) return;
+      
+      try {
+        const response = await fetch(`/api/admin/users/${id}`, {
+          method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('User berhasil dihapus', 'success');
+          loadUsers();
+        } else {
+          showToast(result.message, 'error');
+        }
+      } catch (error) {
+        showToast('Gagal menghapus user', 'error');
+      }
+    }
+
+    function showResetPasswordModal(id, username) {
+      const newPassword = prompt(`Masukkan password baru untuk user "${username}":`);
+      if (!newPassword) return;
+      
+      resetPassword(id, newPassword);
+    }
+
+    async function resetPassword(id, newPassword) {
+      try {
+        const response = await fetch(`/api/admin/users/${id}/reset-password`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ new_password: newPassword })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('Password berhasil direset', 'success');
+        } else {
+          showToast(result.message, 'error');
+        }
+      } catch (error) {
+        showToast('Gagal mereset password', 'error');
+      }
+    }
+
     checkAuth().then(auth => {
       if (auth) fetchData();
     });

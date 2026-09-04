@@ -206,6 +206,78 @@ def check_auth():
             'message': 'Tidak terautentikasi'
         }), 401
 
+@app.route('/api/admin/users', methods=['GET'])
+@login_required
+def get_admin_users():
+    users = Admin.query.order_by(Admin.created_at.desc()).all()
+    data = [{
+        'id': u.id,
+        'username': u.username,
+        'created_at': u.created_at.strftime('%Y-%m-%d %H:%M:%S')
+    } for u in users]
+    return jsonify({'success': True, 'data': data})
+
+@app.route('/api/admin/users', methods=['POST'])
+@login_required
+def create_admin_user():
+    data = request.get_json()
+    
+    if not data or 'username' not in data or 'password' not in data:
+        return jsonify({'success': False, 'message': 'Username dan password wajib diisi'}), 400
+    
+    if Admin.query.filter_by(username=data['username']).first():
+        return jsonify({'success': False, 'message': 'Username sudah digunakan'}), 400
+    
+    hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
+    new_admin = Admin(username=data['username'], password=hashed_password)
+    
+    db.session.add(new_admin)
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': 'User berhasil ditambahkan',
+        'user': {
+            'id': new_admin.id,
+            'username': new_admin.username
+        }
+    })
+
+@app.route('/api/admin/users/<int:id>', methods=['DELETE'])
+@login_required
+def delete_admin_user(id):
+    if current_user.id == id:
+        return jsonify({'success': False, 'message': 'Tidak dapat menghapus akun sendiri'}), 400
+    
+    user = Admin.query.get(id)
+    
+    if not user:
+        return jsonify({'success': False, 'message': 'User tidak ditemukan'}), 404
+    
+    db.session.delete(user)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'User berhasil dihapus'})
+
+@app.route('/api/admin/users/<int:id>/reset-password', methods=['PUT'])
+@login_required
+def reset_admin_password(id):
+    data = request.get_json()
+    
+    if not data or 'new_password' not in data:
+        return jsonify({'success': False, 'message': 'Password baru wajib diisi'}), 400
+    
+    user = Admin.query.get(id)
+    
+    if not user:
+        return jsonify({'success': False, 'message': 'User tidak ditemukan'}), 404
+    
+    hashed_password = generate_password_hash(data['new_password'], method='pbkdf2:sha256')
+    user.password = hashed_password
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Password berhasil direset'})
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
