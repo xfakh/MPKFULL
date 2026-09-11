@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MPK MAS Assalafiyyah - Menampung aspirasi dan pengawasan program siswa">
+  <title>MPK MAS ASSALAFIYYAH</title> 
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='krisismpk.css') }}">
+</head>
+<body class="bg-gradient-to-b from-slate-50 via-emerald-50 to-slate-50 overflow-x-hidden">
+
+  <!-- HEADER & NAVIGATION -->
+  <header class="bg-gradient-to-r from-white via-emerald-50/30 to-white backdrop-blur-xl border-b border-mpk-primary/10 sticky top-0 z-40 shadow-mpk-sm">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex items-center justify-between gap-4 py-5">
+        <div class="brand flex items-center gap-4">
+          <img src="{{ url_for('static', filename='assets/mpkphotos.jpeg') }}" alt="Logo MPK MAS Assalafiyyah" class="w-16 h-16 object-cover rounded-xl shadow-mpk">
+          <div>
+            <div class="title font-extrabold text-lg tracking-tight bg-gradient-to-r from-mpk-primary to-mpk-primary-dark bg-clip-text text-transparent">MPK MAS ASSALAFIYYAH</div>
+            <div class="subtitle text-xs text-mpk-muted font-medium">Majelis Permusyawaratan Kelas</div>
+          </div>
+        </div>

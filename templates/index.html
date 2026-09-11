@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="MPK MAS Assalafiyyah - Menampung aspirasi dan pengawasan program siswa">
   <title>MPK MAS ASSALAFIYYAH — Menampung Aspirasi & Pengawasan Siswa</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -227,31 +228,7 @@
       });
     }
 
-    // Welcome Audio - Play on every page load
-    (function() {
-      const welcomeAudio = new Audio('{{ url_for("static", filename="assets/audio/welcome.mp3") }}');
-      welcomeAudio.autoplay = true;
-      
-      function playAudio() {
-        welcomeAudio.play().then(() => {
-          console.log('Welcome audio playing');
-        }).catch(error => {
-          console.log('Autoplay blocked, waiting for user interaction:', error);
-        });
-        
-        document.removeEventListener('click', playAudio);
-        document.removeEventListener('touchstart', playAudio);
-        document.removeEventListener('keydown', playAudio);
-      }
-      
-      document.addEventListener('click', playAudio, { once: true });
-      document.addEventListener('touchstart', playAudio, { once: true });
-      document.addEventListener('keydown', playAudio, { once: true });
-      
-      welcomeAudio.addEventListener('canplaythrough', () => {
-        welcomeAudio.play().catch(() => {});
-      });
-    })();
+
   </script>
 </body>
 </html>
