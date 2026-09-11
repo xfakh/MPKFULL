@@ -12,9 +12,10 @@ COPY app.py wsgi.py ./
 COPY templates/ templates/
 COPY static/ static/
 COPY assets/ assets/
+COPY migrations/ migrations/
 
 RUN mkdir -p data
 
 EXPOSE 5000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "4", "--timeout", "60", "wsgi:app"]
+CMD ["sh", "-c", "flask db upgrade && gunicorn --bind 0.0.0.0:5000 --workers 1 --threads 4 --timeout 60 wsgi:app"]
