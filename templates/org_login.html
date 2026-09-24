@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login Organisasi MPK MAS Assalafiyyah">
+  <title>Login Organisasi - MPK MAS ASSALAFIYYAH</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'mpk-primary': '#0f6b4f',
+            'mpk-primary-dark': '#074a31',
+            'mpk-primary-light': '#1a8c67',
+            'mpk-accent': '#ffd166',
+            'mpk-muted': '#6b7280',
+            'mpk-muted-dark': '#4b5563',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    
+    @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-slideUp { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    .animate-shake { animation: shake 0.5s ease-in-out; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 min-h-screen font-sans flex items-center justify-center p-6">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8 animate-slideUp">
+      <div class="mb-6">
+        <img src="{{ url_for('static', filename='assets/mpkphotos.jpeg') }}" alt="Logo MPK MAS Assalafiyyah" class="w-24 h-24 mx-auto object-cover rounded-2xl shadow-2xl animate-float border-4 border-white">
+      </div>
+      <h1 class="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">Login Organisasi</h1>
+      <p class="text-mpk-muted text-sm">MPK MAS Assalafiyyah</p>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-2xl border border-blue-200/50 p-8 animate-slideUp">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm mb-4">
+              <i class="fas fa-exclamation-circle mr-2"></i>{{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      
+      <form method="POST" action="{{ url_for('org_login') }}" class="space-y-6">
+        <div class="form-group">
+          <label class="block text-sm font-bold text-mpk-muted-dark mb-2">
+            <i class="fas fa-building text-blue-600 mr-2"></i>Username Organisasi
+          </label>
+          <input type="text" id="username" name="username" required class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 transition-all outline-none placeholder:text-slate-400 bg-slate-50 focus:bg-white" placeholder="Masukkan username organisasi">
+        </div>
+
+        <div class="form-group">
+          <label class="block text-sm font-bold text-mpk-muted-dark mb-2">
+            <i class="fas fa-lock text-blue-600 mr-2"></i>Password
+          </label>
+          <div class="relative">
+            <input type="password" id="password" name="password" required class="w-full px-5 py-3 pr-12 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 transition-all outline-none placeholder:text-slate-400 bg-slate-50 focus:bg-white" placeholder="Masukkan password">
+            <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors">
+              <i id="passwordIcon" class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+          <i class="fas fa-sign-in-alt"></i> Login Organisasi
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <a href="{{ url_for('index') }}" class="text-mpk-muted hover:text-blue-600 transition-colors text-sm">
+          <i class="fas fa-arrow-left mr-2"></i>Kembali ke Beranda
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-8 bg-gradient-to-r from-blue-100/50 via-blue-50/30 to-blue-100/50 rounded-2xl p-6 border border-blue-200/30 animate-slideUp">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-info text-white"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-mpk-primary-dark mb-1">Informasi Login</h3>
+          <p class="text-sm text-mpk-muted-dark">Hubungi admin MPK untuk mendapatkan kredensial login organisasi.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-slate-400 mt-6">
+      <i class="fas fa-lock mr-1"></i>
+      Halaman ini dilindungi. Hanya untuk organisasi yang terdaftar.
+    </p>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const passwordIcon = document.getElementById('passwordIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordIcon.classList.remove('fa-eye');
+        passwordIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        passwordIcon.classList.remove('fa-eye-slash');
+        passwordIcon.classList.add('fa-eye');
+      }
+    }
+  </script>
+</body>
+</html>
