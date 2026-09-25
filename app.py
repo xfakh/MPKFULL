@@ -696,6 +696,116 @@ def admin_download_file(file_id):
     except Exception as e:
         return jsonify({'success': False, 'message': f'Gagal download file: {str(e)}'}), 500
 
+
+@app.route('/api/dashboard/stats')
+@login_required
+@admin_required
+def get_dashboard_stats():
+    """
+    API endpoint untuk mendapatkan statistics dashboard admin
+    Returns: stats cards data, trend data, kategori distribution, top organizations
+    """
+    try:
+        # Get current date range
+        end_date = datetime.utcnow()
+        start_date_6m = end_date.replace(month=max(1, end_date.month - 6)) if end_date.month > 6 else \
+            datetime(end_date.year - 1, end_date.month + 6, end_date.day)
+        
+        start_date_30d = end_date.replace(day=max(1, end_date.day - 30))
+        start_date_7d = end_date.replace(day=max(1, end_date.day - 7))
+        
+        # Stats Cards - Current Period
+        total_current = Aspirasi.query.count()
+        pending_current = Aspirasi.query.filter_by(status='pending').count()
+        diproses_current = Aspirasi.query.filter_by(status='diproses').count()
+        selesai_current = Aspirasi.query.filter_by(status='selesai').count()
+        
+        # Stats Cards - Previous Period (for trend comparison)
+        total_prev = Aspirasi.query.filter(Aspirasi.created_at < start_date_30d).count()
+        pending_prev = Aspirasi.query.filter(Aspirasi.created_at < start_date_30d, Aspirasi.status == 'pending').count()
+        diproses_prev = Aspirasi.query.filter(Aspirasi.created_at < start_date_30d, Aspirasi.status == 'diproses').count()
+        selesai_prev = Aspirasi.query.filter(Aspirasi.created_at < start_date_30d, Aspirasi.status == 'selesai').count()
+        
+        # Calculate trends (percentage change)
+        def calc_trend(current, prev):
+            if prev == 0:
+                return 0
+            return ((current - prev) / prev) * 100
+        
+        # 6-Month Trend Data (Line Chart)
+        trend_data = []
+        for i in range(6, -1, -1):
+            month_date = end_date.replace(month=max(1, end_date.month - i)) if end_date.month > i else \
+                datetime(end_date.year - 1, end_date.month + 12 - i, end_date.day)
+            month_start = datetime(month_date.year, month_date.month, 1)
+            month_end = datetime(month_date.year, month_date.month + 1, 1) if month_date.month < 12 else \
+                datetime(month_date.year + 1, 1, 1)
+            
+            month_aspirasi = Aspirasi.query.filter(
+                Aspirasi.created_at >= month_start,
+                Aspirasi.created_at < month_end
+            ).all()
+            
+            month_total = len(month_aspirasi)
+            month_selesai = len([a for a in month_aspirasi if a.status == 'selesai'])
+            
+            trend_data.append({
+                'label': month_date.strftime('%B %Y'),
+                'total': month_total,
+                'selesai': month_selesai
+            })
+        
+        # Kategori Distribution (Pie Chart)
+        kategori_distribution = []
+        kategori_data = db.session.query(
+            Aspirasi.kategori,
+            db.func.count(Aspirasi.id).label('jumlah')
+        ).group_by(Aspirasi.kategori).all()
+        
+        for kategori, jumlah in kategori_data:
+            kategori_distribution.append({
+                'kategori': kategori,
+                'jumlah': jumlah
+            })
+        
+        # Top 10 Organizations by File Count (Bar Chart)
+        organi_data = db.session.query(
+            Organization.name,
+            db.func.count(OrganizationFile.id).label('file_count')
+        ).join(OrganizationFile).group_by(Organization.id).order_by(db.desc('file_count')).limit(10).all()
+        
+        organi = []
+        for name, file_count in organi_data:
+            organi.append({
+                'name': name,
+                'file_count': file_count
+            })
+        
+        stats = {
+            'total': total_current,
+            'total_trend': calc_trend(total_current, total_prev),
+            'pending': pending_current,
+            'pending_trend': calc_trend(pending_current, pending_prev),
+            'diproses': diproses_current,
+            'diproses_trend': calc_trend(diproses_current, diproses_prev),
+            'selesai': selesai_current,
+            'selesai_trend': calc_trend(selesai_current, selesai_prev)
+        }
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'stats': stats,
+                'trend_data': trend_data,
+                'kategori_distribution': kategori_distribution,
+                'organi': organi
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
