@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """
 Script untuk menambahkan organisasi contoh ke database
-Gunakan: python seed_organizations.py
+Gunakan dari root project: python scripts/seed_organizations.py
 """
+
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import app, db, Organization
 from werkzeug.security import generate_password_hash

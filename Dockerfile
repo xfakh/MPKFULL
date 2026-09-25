@@ -11,7 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py wsgi.py ./
 COPY templates/ templates/
 COPY static/ static/
-COPY assets/ assets/
 COPY migrations/ migrations/
 
 RUN mkdir -p data
