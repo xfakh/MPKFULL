@@ -98,8 +98,6 @@
 
     <div id="aspirasiFormContainer" class="hidden form-section bg-white rounded-3xl shadow-2xl border border-mpk-primary/10 p-8 md:p-12 animate-slideIn">
       <form id="aspirasiForm" class="space-y-6">
-        <input type="hidden" id="formGender" name="gender">
-        
         <div class="header-form text-center mb-8">
           <h2 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-mpk-primary to-mpk-primary-dark bg-clip-text text-transparent mb-3">Formulir Aspirasi</h2>
           <p class="text-mpk-muted text-sm">Mohon isi semua data dengan benar</p>
@@ -119,17 +117,21 @@
             </label>
             <select id="kelas" name="kelas" required class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none bg-slate-50 focus:bg-white">
               <option value="">Pilih Kelas</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="block text-sm font-bold text-mpk-muted-dark mb-2">
-              <i class="fas fa-venus-mars text-mpk-primary mr-2"></i>Gender <span class="text-red-500">*</span>
-            </label>
-            <select id="gender" name="gender" required class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:border-mpk-primary focus:ring-2 focus:ring-mpk-primary/20 transition-all outline-none bg-slate-50 focus:bg-white">
-              <option value="">Pilih Gender</option>
-              <option value="Putra">Putra</option>
-              <option value="Putri">Putri</option>
+              <option value="10A">10A</option>
+              <option value="10B">10B</option>
+              <option value="10C">10C</option>
+              <option value="10D">10D</option>
+              <option value="10E">10E</option>
+              <option value="11A">11A</option>
+              <option value="11B">11B</option>
+              <option value="11C">11C</option>
+              <option value="11D">11D</option>
+              <option value="11E">11E</option>
+              <option value="12A">12A</option>
+              <option value="12B">12B</option>
+              <option value="12C">12C</option>
+              <option value="12D">12D</option>
+              <option value="12E">12E</option>
             </select>
           </div>
 
@@ -224,8 +226,6 @@
 
     function selectGender(gender) {
       currentGender = gender;
-      document.getElementById('formGender').value = gender;
-      document.getElementById('gender').value = gender === 'putra' ? 'Putra' : 'Putri';
       
       updateKelasOptions(gender);
       
@@ -250,11 +250,10 @@
       
       const nama = document.getElementById('nama').value.trim();
       const kelas = document.getElementById('kelas').value;
-      const gender = document.getElementById('gender').value;
       const kategori = document.getElementById('kategori').value;
       const deskripsi = document.getElementById('deskripsi').value.trim();
       
-      if (!nama || !kelas || !gender || !kategori || !deskripsi) {
+      if (!nama || !kelas || !kategori || !deskripsi) {
         alert('Semua field wajib diisi!');
         return;
       }
@@ -266,7 +265,7 @@
         const response = await fetch('/api/aspirasi', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nama, kelas, gender, kategori, deskripsi })
+          body: JSON.stringify({ nama, kelas, kategori, deskripsi })
         });
         
         const result = await response.json();
@@ -274,9 +273,9 @@
         loadingModal.classList.add('hidden');
         
         if (result.success) {
-          console.log('Data aspirasi:', { nama, kelas, gender, kategori, deskripsi });
+          console.log('Data aspirasi:', { nama, kelas, kategori, deskripsi });
           localStorage.setItem('mpk_last_aspirasi', JSON.stringify({ 
-            nama, kelas, gender, kategori, deskripsi,
+            nama, kelas, kategori, deskripsi,
             timestamp: new Date().toISOString(),
             id: result.id 
           }));

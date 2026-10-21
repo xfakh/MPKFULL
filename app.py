@@ -46,7 +46,7 @@ class Aspirasi(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(100), nullable=False)
     kelas = db.Column(db.String(20), nullable=False)
-    gender = db.Column(db.String(20), nullable=False)
+    gender = db.Column(db.String(20), default='-')
     kategori = db.Column(db.String(50), nullable=False)
     deskripsi = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default='pending')
@@ -193,15 +193,15 @@ def save_aspirasi():
     if not data:
         return jsonify({'success': False, 'message': 'Data tidak valid'}), 400
     
-    required_fields = ['nama', 'kelas', 'gender', 'kategori', 'deskripsi']
+    required_fields = ['nama', 'kelas', 'kategori', 'deskripsi']
     for field in required_fields:
         if field not in data or not data[field]:
             return jsonify({'success': False, 'message': f'Field {field} wajib diisi'}), 400
-    
+
     aspirasi = Aspirasi(
         nama=data['nama'],
         kelas=data['kelas'],
-        gender=data['gender'],
+        gender=data.get('gender', '-'),
         kategori=data['kategori'],
         deskripsi=data['deskripsi']
     )
