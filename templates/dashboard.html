@@ -840,15 +840,9 @@
       showToast(newTheme === 'dark' ? 'Dark mode enabled' : 'Light mode enabled', 'info');
     }
 
-    async function logout() {
+    function logout() {
       if (!confirm('Apakah Anda yakin ingin logout?')) return;
-      
-      try {
-        await fetch('/logout');
-        window.location.href = '/login';
-      } catch (error) {
-        alert('Gagal logout');
-      }
+      window.location.href = '/logout';
     }
 
     async function fetchData() {
