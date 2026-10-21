@@ -800,8 +800,8 @@
       // Update active state in sidebar
       updateActiveNav('files');
       
-      // Load files data
-      loadFiles();
+      // Load organisations for filter and files data
+      loadOrganizations();
     }
 
     function updateActiveNav(activeId) {
@@ -1379,8 +1379,8 @@
       tbody.innerHTML = filesData.map((file, index) => `
         <tr class="hover:bg-slate-50 transition-colors">
           <td class="px-6 py-4 text-sm text-slate-600">${index + 1}</td>
-          <td class="px-6 py-4 text-sm font-medium text-slate-900">${escapeHtml(file.organization_name)}</td>
-          <td class="px-6 py-4 text-sm text-slate-900">${escapeHtml(file.file_name)}</td>
+          <td class="px-6 py-4 text-sm font-bold text-slate-900">${escapeHtml(file.organization_name)}</td>
+          <td class="px-6 py-4 text-sm font-bold text-slate-900">${escapeHtml(file.file_name)}</td>
           <td class="px-6 py-4 text-sm text-slate-600">${file.file_type.toUpperCase()}</td>
           <td class="px-6 py-4 text-sm text-slate-600">${(file.file_size / 1024).toFixed(2)} KB</td>
           <td class="px-6 py-4 text-sm text-slate-600">${escapeHtml(file.uploaded_at)}</td>
