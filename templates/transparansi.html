@@ -201,6 +201,11 @@
           </div>
         </a>
         <div class="flex items-center gap-2">
+          <div id="serverClock" class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full bg-white border border-mpk-primary/15 shadow-mpk-sm text-xs font-semibold text-mpk-muted-dark" title="Waktu server (WIB)">
+            <i class="fas fa-server text-mpk-primary text-[11px]"></i>
+            <span class="font-mono tabular-nums" id="serverClockTime">--:--:--</span>
+            <span class="text-[10px] font-bold text-mpk-primary">WIB</span>
+          </div>
           <a href="{{ url_for('index') }}" class="px-4 py-2 text-sm font-semibold text-mpk-primary hover:text-mpk-primary-dark transition-colors hidden md:inline-flex items-center gap-2">
             <i class="fas fa-home"></i> Beranda
           </a>
@@ -277,6 +282,17 @@
 
     <!-- FILTER -->
     <section class="bg-white rounded-mpk-lg p-4 shadow-mpk-sm border border-mpk-primary/10 mb-4 flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2 mr-2 pr-3 border-r border-slate-200">
+        <i class="fas fa-clock-rotate-left text-mpk-primary text-xs"></i>
+        <div class="leading-tight">
+          <div class="text-[10px] uppercase tracking-wide font-bold text-mpk-muted">Jam server</div>
+          <div class="flex items-baseline gap-1">
+            <span id="filterClockTime" class="font-mono tabular-nums text-sm font-bold text-mpk-primary-dark">--:--:--</span>
+            <span class="text-[10px] font-bold text-mpk-primary">WIB</span>
+          </div>
+          <div id="filterClockDate" class="font-mono text-[10px] text-slate-400 tabular-nums">—</div>
+        </div>
+      </div>
       <span class="text-xs font-bold uppercase tracking-wide text-mpk-muted mr-1"><i class="fas fa-filter mr-1"></i>Filter</span>
       <div class="filter-field" data-filter="status">
         <i class="fas fa-circle-dot field-icon"></i>
@@ -386,9 +402,14 @@
 
     let countdown = REFRESH_SECONDS;
     let timerId = null;
+    let clockTimerId = null;
     let feedData = [];
     let isLoading = false;
     let activeFilters = { status: '', kategori: '' };
+
+    // Jam server: offset antara waktu server (WIB) dan jam perangkat pengunjung
+    let serverOffsetMs = 0;
+    let serverClockSynced = false;
 
     const STATUS_STYLE = {
       pending:  { badge: 'bg-red-100 text-red-700',      label: 'Pending'  },
@@ -483,6 +504,56 @@
       document.getElementById('statDiproses').textContent = stats.diproses;
       document.getElementById('statSelesai').textContent = stats.selesai;
       document.getElementById('statPersen').textContent = `${stats.persen_selesai}% dari total`;
+      // server_time hanya jadi cadangan bila /api/server-time belum berhasil
+      if (stats.server_time && !serverClockSynced) {
+        serverClockSynced = true;
+        renderClock();
+      }
+    }
+
+    function renderClock() {
+      if (!serverClockSynced) return;
+      const absolute = new Date(Date.now() + serverOffsetMs);
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hourCycle: 'h23'
+      }).formatToParts(absolute);
+      const get = (type) => parts.find(p => p.type === type)?.value || '00';
+      const time = `${get('hour')}:${get('minute')}:${get('second')}`;
+
+      const dateParts = new Intl.DateTimeFormat('id-ID', {
+        timeZone: 'Asia/Jakarta', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      }).formatToParts(absolute);
+      const dget = (type) => dateParts.find(p => p.type === type)?.value || '';
+      const date = `${dget('weekday')}, ${dget('day')} ${dget('month')} ${dget('year')}`;
+
+      document.getElementById('serverClockTime').textContent = time;
+      document.getElementById('filterClockTime').textContent = time;
+      document.getElementById('filterClockDate').textContent = date;
+    }
+
+    function startClock() {
+      if (clockTimerId) clearInterval(clockTimerId);
+      clockTimerId = setInterval(() => {
+        if (document.hidden) return;
+        renderClock();
+      }, 1000);
+      renderClock();
+    }
+
+    async function loadServerTime() {
+      try {
+        const res = await fetch('/api/server-time', { headers: { 'Accept': 'application/json' } });
+        const json = await res.json();
+        if (json.success && json.data) {
+          serverOffsetMs = json.data.epoch_ms - Date.now();
+          serverClockSynced = true;
+          renderClock();
+        }
+      } catch (error) {
+        console.error('Gagal mengambil waktu server:', error);
+      }
     }
 
     async function loadFeed() {
@@ -525,6 +596,7 @@
         isLoading = false;
         refreshIcon.classList.remove('animate-spin');
         countdown = REFRESH_SECONDS;
+        loadServerTime(); // re-sinkron jam tiap siklus agar tidak melenceng
       }
     }
 
@@ -560,7 +632,9 @@
       if (document.hidden) {
         if (timerId) { clearInterval(timerId); timerId = null; }
       } else {
+        loadServerTime();
         startTimer();
+        startClock();
         loadFeed();
       }
       updateLiveText();
@@ -696,6 +770,8 @@
 
     // ---- init ----
     syncFilterUI();
+    loadServerTime();
+    startClock();
     loadFeed().then(startTimer);
   </script>
 </body>

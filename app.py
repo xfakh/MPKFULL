@@ -4,10 +4,30 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 import os
 import uuid
+
+# --- Zona waktu server (WIB) ---
+# Semua timestamp disimpan di DB dalam UTC (datetime.utcnow, backward compatible),
+# lalu dikonversi ke WIB saat ditampilkan/dikirim ke client.
+try:
+    from zoneinfo import ZoneInfo
+    SERVER_TZ = ZoneInfo('Asia/Jakarta')
+except Exception:  # fallback bila tzdata tidak tersedia
+    SERVER_TZ = timezone(timedelta(hours=7), 'WIB')
+
+SERVER_TZ_LABEL = 'WIB'
+
+
+def to_server_time(dt, fmt='%Y-%m-%d %H:%M:%S'):
+    """Konversi datetime UTC dari DB ke waktu lokal server (WIB) sebagai string."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(SERVER_TZ).strftime(fmt)
 
 
 def derive_aspirasi_code(aspirasi_id):
@@ -284,7 +304,7 @@ def get_public_aspirasi():
         data.append({
             'id': a.id,
             'code': a.code,
-            'created_at': a.created_at.strftime('%Y-%m-%d %H:%M:%S') if a.created_at else None,
+            'created_at': to_server_time(a.created_at),
             'kelas': a.kelas,
             'kategori': a.kategori,
             'deskripsi': deskripsi,
@@ -309,7 +329,26 @@ def get_public_aspirasi_stats():
             'pending': pending,
             'diproses': diproses,
             'selesai': selesai,
-            'persen_selesai': persen_selesai
+            'persen_selesai': persen_selesai,
+            'server_time': to_server_time(datetime.utcnow()),
+            'server_tz': SERVER_TZ_LABEL,
+            'server_utc_offset': datetime.now(SERVER_TZ).strftime('%z')
+        }
+    })
+
+@app.route('/api/server-time', methods=['GET'])
+def server_time():
+    """Waktu server untuk halaman publik (WIB), berguna untuk verifikasi jam feed."""
+    now = datetime.now(SERVER_TZ)
+    return jsonify({
+        'success': True,
+        'data': {
+            'datetime': now.strftime('%Y-%m-%d %H:%M:%S'),
+            'time': now.strftime('%H:%M:%S'),
+            'date': now.strftime('%Y-%m-%d'),
+            'timezone': SERVER_TZ_LABEL,
+            'utc_offset': now.strftime('%z'),
+            'epoch_ms': int(now.timestamp() * 1000)
         }
     })
 
