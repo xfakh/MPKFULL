@@ -60,6 +60,7 @@
           <a href="#home" class="px-4 py-2 text-sm font-semibold text-mpk-primary hover:text-mpk-primary-dark transition-colors">Beranda</a>
           <a href="#tentang" class="px-4 py-2 text-sm font-semibold text-mpk-primary hover:text-mpk-primary-dark transition-colors">Tentang</a>
           <a href="#program" class="px-4 py-2 text-sm font-semibold text-mpk-primary hover:text-mpk-primary-dark transition-colors">Program</a>
+          <a href="{{ url_for('transparansi') }}" class="px-4 py-2 text-sm font-semibold text-mpk-primary hover:text-mpk-primary-dark transition-colors">Transparansi</a>
           <a class="cta bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-6 py-3 rounded-mpk font-semibold text-sm shadow-mpk hover:shadow-mpk-lg transition-all hover:-translate-y-0.5" href="#kontak">Hubungi Kami</a>
           <a href="{{ url_for('login') }}" class="bg-gradient-to-r from-slate-100 via-white to-slate-100 text-mpk-primary border border-mpk-primary/20 px-5 py-2.5 rounded-mpk font-semibold text-sm hover:border-mpk-primary hover:shadow-mpk transition-all flex items-center gap-2">
             <i class="fas fa-sign-in-alt"></i> Login
@@ -80,8 +81,8 @@
           <a class="btn-primary bg-gradient-to-r from-mpk-primary to-emerald-800 text-white px-6 py-3 rounded-mpk font-bold text-base shadow-mpk-lg hover:shadow-mpk-xl transition-all hover:-translate-y-1 hover:scale-105 flex items-center gap-3" href="{{ url_for('krisisan') }}">
             <i class="fas fa-bullhorn text-lg"></i> Sampaikan Aspirasi
           </a>
-          <a class="btn-secondary bg-gradient-to-r from-white/80 to-emerald-50/80 text-mpk-primary px-6 py-3 rounded-mpk font-bold text-base shadow-mpk-sm hover:bg-white hover:shadow-mpk transition-all border border-mpk-primary/20 flex items-center gap-3" href="#program">
-            <i class="fas fa-eye text-lg"></i> Lihat Program
+          <a class="btn-secondary bg-gradient-to-r from-white/80 to-emerald-50/80 text-mpk-primary px-6 py-3 rounded-mpk font-bold text-base shadow-mpk-sm hover:bg-white hover:shadow-mpk transition-all border border-mpk-primary/20 flex items-center gap-3" href="{{ url_for('transparansi') }}">
+            <i class="fas fa-list-check text-lg"></i> Lihat Aspirasi Masuk
           </a>
         </div>
 
@@ -162,6 +163,9 @@
           <div class="program-icon text-6xl text-mpk-primary mb-6 transform group-hover:scale-110 transition-transform duration-500"><i class="fas fa-comments"></i></div>
           <h3 class="text-2xl font-bold text-mpk-primary-dark mb-4">Penampung Aspirasi</h3>
           <p class="text-mpk-muted-dark leading-relaxed">Menampung kritik, saran, dan aspirasi dari siswa, kemudian dievaluasi setiap bulan.</p>
+          <a href="{{ url_for('transparansi') }}" class="inline-flex items-center gap-2 mt-5 text-mpk-primary font-semibold text-sm hover:underline">
+            <i class="fas fa-arrow-right"></i> Lihat aspirasi masuk
+          </a>
         </div>
         <div class="program-card zoom-in bg-gradient-to-br from-white via-blue-50/20 to-white p-10 rounded-mpk-xl shadow-mpk border border-blue-500/10 text-center hover:shadow-mpk-xl hover:-translate-y-3 transition-all duration-500 group relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
@@ -201,6 +205,7 @@
         <a href="#home" class="text-slate-400 hover:text-emerald-400 transition-colors font-medium">Beranda</a>
         <a href="#tentang" class="text-slate-400 hover:text-emerald-400 transition-colors font-medium">Tentang</a>
         <a href="#program" class="text-slate-400 hover:text-emerald-400 transition-colors font-medium">Program</a>
+        <a href="{{ url_for('transparansi') }}" class="text-slate-400 hover:text-emerald-400 transition-colors font-medium">Transparansi</a>
         <a href="#kontak" class="text-slate-400 hover:text-emerald-400 transition-colors font-medium">Kontak</a>
       </div>
     </div>

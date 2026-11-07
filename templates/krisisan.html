@@ -170,10 +170,14 @@
       </form>
     </div>
 
-    <div class="back-link mt-8 text-center">
+    <div class="back-link mt-8 text-center flex flex-col sm:flex-row gap-3 justify-center">
       <a href="{{ url_for('index') }}" class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-slate-100 via-white to-slate-100 text-mpk-muted-dark font-semibold text-base hover:border-mpk-primary/30 hover:text-mpk-primary hover:shadow-lg transition-all duration-300 group">
         <i class="fas fa-arrow-left transition-transform duration-300 group-hover:-translate-x-2"></i>
         <span>Kembali ke Beranda</span>
+      </a>
+      <a href="{{ url_for('transparansi') }}" class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-slate-100 via-white to-slate-100 text-mpk-muted-dark font-semibold text-base hover:border-mpk-primary/30 hover:text-mpk-primary hover:shadow-lg transition-all duration-300 group">
+        <i class="fas fa-list-check"></i>
+        <span>Lihat Aspirasi di Transparansi</span>
       </a>
     </div>
   </div>
@@ -192,10 +196,20 @@
         <i class="fas fa-check-circle text-5xl text-white"></i>
       </div>
       <h3 class="text-2xl font-extrabold text-mpk-primary-dark mb-2">Aspirasi Terkirim!</h3>
-      <p class="text-mpk-muted mb-6">Terima kasih telah menyampaikan aspirasi Anda. MPK akan segera memproses dan menindaklanjuti aspirasi Anda.</p>
-      <button onclick="closeSuccessModal()" class="w-full bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-8 py-4 rounded-xl font-bold text-base hover:shadow-lg transition-all hover:-translate-y-0.5">
-        <i class="fas fa-home mr-2"></i>Kembali ke Beranda
-      </button>
+      <p class="text-mpk-muted mb-4">Terima kasih telah menyampaikan aspirasi Anda. MPK akan segera memproses dan menindaklanjuti aspirasi Anda.</p>
+      <div id="successCodeBox" class="hidden mb-6 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider font-bold text-emerald-700">Kode aspirasi Anda</div>
+        <div id="successCode" class="font-mono text-2xl font-extrabold text-mpk-primary-dark"></div>
+        <div class="text-[11px] text-emerald-800/70 mt-1">Simpan kode ini untuk melacak status di halaman Transparansi.</div>
+      </div>
+      <div class="space-y-3">
+        <a href="{{ url_for('transparansi') }}" class="w-full bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-8 py-4 rounded-xl font-bold text-base hover:shadow-lg transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+          <i class="fas fa-list-check"></i> Lihat di Halaman Transparansi
+        </a>
+        <button onclick="closeSuccessModal()" class="w-full bg-gradient-to-r from-slate-100 via-white to-slate-100 text-mpk-muted-dark border border-slate-300 px-8 py-3 rounded-xl font-bold text-base hover:text-mpk-primary hover:shadow transition-all">
+          <i class="fas fa-home mr-2"></i>Kembali ke Beranda
+        </button>
+      </div>
     </div>
   </div>
 
@@ -278,8 +292,17 @@
           localStorage.setItem('mpk_last_aspirasi', JSON.stringify({ 
             nama, kelas, gender, kategori, deskripsi,
             timestamp: new Date().toISOString(),
-            id: result.id 
+            id: result.id,
+            code: result.code || null
           }));
+
+          const codeBox = document.getElementById('successCodeBox');
+          if (result.code) {
+            document.getElementById('successCode').textContent = result.code;
+            codeBox.classList.remove('hidden');
+          } else {
+            codeBox.classList.add('hidden');
+          }
           
           document.getElementById('successModal').classList.remove('hidden');
           document.getElementById('aspirasiForm').reset();
