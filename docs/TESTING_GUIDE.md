@@ -119,13 +119,14 @@ Aplikasi akan berjalan di: **http://127.0.0.1:5000**
 
 #### ✅ Test Akses Dashboard Admin Org
 1. Login sebagai admin (admin/mpkassalafiyyah)
-2. Akses: **http://127.0.0.1:5000/org/admin/dashboard**
-3. **Expected:** Melihat dashboard monitoring organisasi
+2. Buka **http://127.0.0.1:5000/dashboard**
+3. Pilih menu **"Manajemen Organisasi"** di sidebar
+4. **Expected:** Melihat halaman monitoring organisasi
 
 #### ✅ Test View List Organisasi
-1. Di dashboard admin organisasi, tab "Organisasi"
-2. **Expected:** Melihat tabel dengan 5 organisasi:
-   - OSIS, Rohis, Pramuka, PMR, Paskibra
+1. Di dashboard admin, buka menu **"Manajemen Organisasi"**
+2. **Expected:** Melihat tabel dengan 4 organisasi:
+   - OSIM, GPS, Jurnalistik, ARSC
    - Username, email, jumlah file, status
 
 #### ✅ Test Tambah Organisasi Baru
@@ -143,7 +144,7 @@ Aplikasi akan berjalan di: **http://127.0.0.1:5000**
 
 #### ✅ Test Tambah Organisasi Duplikat Username
 1. Klik "Tambah Organisasi"
-2. Isi dengan username yang sudah ada (contoh: osis)
+2. Isi dengan username yang sudah ada (contoh: osim)
 3. **Expected:** Error "Username sudah digunakan"
 
 #### ✅ Test View File Organisasi

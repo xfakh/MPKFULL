@@ -300,22 +300,25 @@ http://localhost:8080
 Admin bisa membuat organisasi dengan struktur:
 
 ```
-Nama Organisasi: OSIS
-Username: osis
-Email: osis@example.com
+Nama Organisasi: OSIM
+Username: osim
+Email: osim@masassalafiyyah.sch.id
 Password: [diatur oleh admin]
 
-Nama Organisasi: Rohis
-Username: rohis
-Email: rohis@example.com
+Nama Organisasi: GPS
+Username: gps
+Email: gps@masassalafiyyah.sch.id
 Password: [diatur oleh admin]
 
-Nama Organisasi: Pramuka
-Username: pramuka
-Email: pramuka@example.com
+Nama Organisasi: Jurnalistik
+Username: jurnalistik
+Email: jurnalistik@masassalafiyyah.sch.id
 Password: [diatur oleh admin]
 
-Dan seterusnya...
+Nama Organisasi: ARSC
+Username: arsc
+Email: arsc@masassalafiyyah.sch.id
+Password: [diatur oleh admin]
 ```
 
 ---

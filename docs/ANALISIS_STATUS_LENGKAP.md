@@ -42,7 +42,7 @@
 
 ### **2. FITUR ORGANISASI SEKOLAH** ✅ LENGKAP
 - ✅ Login Organisasi (via unified `/login`)
-  - Organisasi yang tersedia: OSIS, Rohis, Pramuka, PMR, Paskibra
+  - Organisasi yang tersedia: OSIM, GPS, Jurnalistik, ARSC
   - Auto-redirect ke dashboard organisasi setelah login
 
 - ✅ Dashboard Organisasi di `/org/dashboard`

@@ -17,38 +17,33 @@ def seed_organizations():
     
     organizations = [
         {
-            'name': 'OSIS',
-            'username': 'osis',
-            'email': 'osis@masassalafiyyah.sch.id',
-            'password': 'osis123'
+            'name': 'OSIM',
+            'username': 'osim',
+            'email': 'osim@masassalafiyyah.sch.id',
+            'password': 'osim123'
         },
         {
-            'name': 'Rohis',
-            'username': 'rohis',
-            'email': 'rohis@masassalafiyyah.sch.id',
-            'password': 'rohis123'
+            'name': 'GPS',
+            'username': 'gps',
+            'email': 'gps@masassalafiyyah.sch.id',
+            'password': 'gps123'
         },
         {
-            'name': 'Pramuka',
-            'username': 'pramuka',
-            'email': 'pramuka@masassalafiyyah.sch.id',
-            'password': 'pramuka123'
+            'name': 'Jurnalistik',
+            'username': 'jurnalistik',
+            'email': 'jurnalistik@masassalafiyyah.sch.id',
+            'password': 'jurnalistik123'
         },
         {
-            'name': 'PMR',
-            'username': 'pmr',
-            'email': 'pmr@masassalafiyyah.sch.id',
-            'password': 'pmr123'
-        },
-        {
-            'name': 'Paskibra',
-            'username': 'paskibra',
-            'email': 'paskibra@masassalafiyyah.sch.id',
-            'password': 'paskibra123'
+            'name': 'ARSC',
+            'username': 'arsc',
+            'email': 'arsc@masassalafiyyah.sch.id',
+            'password': 'arsc123'
         }
     ]
     
     with app.app_context():
+        db.create_all()
         print("🚀 Memulai seeding organisasi...\n")
         
         for org_data in organizations:
