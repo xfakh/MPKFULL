@@ -10,4 +10,5 @@ docs/
 .env
 Dockerfile
 docker-compose.yml
-index.html
+*.log
+scripts/

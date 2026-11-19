@@ -32,26 +32,27 @@ Sistem manajemen aspirasi siswa untuk MPK MAS Assalafiyyah menggunakan Flask fra
 
 ```
 MPKFULL/
-├── app.py                 # Main Flask application
-├── wsgi.py                # Entry point gunicorn + init DB (production)
-├── Dockerfile             # Build image production
-├── docker-compose.yml     # Orkestrasi container Docker
-├── .dockerignore          # Exclude files dari build context
 ├── requirements.txt       # Python dependencies
 ├── .gitignore            # Git ignore rules
 ├── venv/                 # Virtual environment
+├── app.py                # Main Flask application
+├── wsgi.py               # Entry point gunicorn + init DB (production)
+├── Dockerfile            # Build image production
+├── docker-compose.yml    # Orkestrasi container Docker
+├── .dockerignore         # Exclude files dari build context
 ├── templates/            # HTML templates (Flask Jinja2)
-│   ├── index.html       # Landing page
-│   ├── login.html       # Login admin
-│   ├── krisisan.html    # Form aspirasi
-│   └── dashboard.html   # Dashboard admin
-├── static/              # Static files (CSS, JS, Images)
-│   ├── assets/
-│   │   ├── picture/
-│   │   └── audio/
+│   ├── index.html        # Landing page
+│   ├── krisisan.html     # Form aspirasi
+│   ├── login.html        # Login admin
+│   └── dashboard.html    # Dashboard admin
+├── static/               # Static files (CSS, gambar, audio)
+│   ├── assets/           # Gambar & audio
 │   └── krisismpk.css
-├── assets/              # Assets tambahan
-└── data/                # SQLite database
+├── scripts/              # Script utilitas (seed data, dll.)
+│   └── seed_organizations.py
+├── migrations/           # Migrasi database (Flask-Migrate/Alembic)
+├── docs/                 # Dokumentasi project
+└── data/                 # SQLite database (auto-created, gitignored)
     └── aspirasi.db      # Database (auto-created)
 ```
 

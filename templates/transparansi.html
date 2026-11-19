@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Feed transparansi aspirasi siswa MPK MAS Assalafiyyah - anonim, tanpa nama">
+  <title>MPK MAS ASSALAFIYYAH — Transparansi Aspirasi</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'mpk-primary': '#0f6b4f',
+            'mpk-primary-dark': '#074a31',
+            'mpk-primary-light': '#1a8c67',
+            'mpk-accent': '#ffd166',
+            'mpk-accent-light': '#ffdb8c',
+            'mpk-muted': '#6b7280',
+            'mpk-muted-dark': '#4b5563',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+          },
+          boxShadow: {
+            'mpk': '0 4px 12px rgba(15, 107, 79, 0.1)',
+            'mpk-lg': '0 10px 24px rgba(15, 107, 79, 0.15)',
+            'mpk-sm': '0 2px 6px rgba(15, 107, 79, 0.08)',
+          },
+          borderRadius: {
+            'mpk': '16px',
+            'mpk-lg': '20px',
+            'mpk-xl': '24px',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='krisismpk.css') }}">
+  <style>
+    @keyframes livePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); opacity: 1; }
+      50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); opacity: 0.75; }
+    }
+    .live-dot { animation: livePulse 2s ease-in-out infinite; }
+
+    @keyframes rowIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .row-in { animation: rowIn 0.35s ease both; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .animate-fadeIn { animation: fadeIn 0.25s ease forwards; }
+    .animate-modalIn { animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Aksen kiri tipis per baris mengikuti status */
+    .feed-row td:first-child { position: relative; }
+    .feed-row td:first-child::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: transparent;
+    }
+    .feed-row.status-pending td:first-child::before { background: #ef4444; }
+    .feed-row.status-diproses td:first-child::before { background: #ffd166; }
+    .feed-row.status-selesai td:first-child::before { background: #10b981; }
+
+    /* Sticky header di dalam scroll container */
+    .feed-scroll { max-height: 65vh; overflow: auto; }
+    .feed-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: linear-gradient(90deg, #074a31 0%, #0f6b4f 100%);
+    }
+    .feed-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+    .feed-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+    .feed-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+    .feed-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .empty-cell { background-image: radial-gradient(circle at 1px 1px, #e2e8f0 1px, transparent 0); background-size: 18px 18px; }
+
+    /* FILTER SELECT */
+    .filter-field { position: relative; display: inline-flex; align-items: center; }
+    .filter-field > i.field-icon {
+      position: absolute;
+      left: 12px;
+      font-size: 11px;
+      color: #0f6b4f;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .filter-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem 0.5rem 2.1rem;
+      border-radius: 9999px;
+      border: 1px solid #cbd5e1;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      color: #334155;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      line-height: 1.25rem;
+      cursor: pointer;
+      outline: none;
+      white-space: nowrap;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+    .filter-trigger:hover {
+      border-color: rgba(15, 107, 79, 0.45);
+      background: linear-gradient(180deg, #ffffff 0%, #eef7f3 100%);
+      color: #074a31;
+    }
+    .filter-trigger:focus-visible {
+      border-color: #0f6b4f;
+      box-shadow: 0 0 0 3px rgba(15, 107, 79, 0.15);
+    }
+    .filter-field.is-open .filter-trigger,
+    .filter-field.is-active .filter-trigger {
+      border-color: #0f6b4f;
+      color: #074a31;
+    }
+    .filter-field.is-active .filter-trigger {
+      background: linear-gradient(180deg, #ffffff 0%, #e6f5ee 100%);
+    }
+    .filter-chevron { font-size: 10px; color: #6b7280; transition: transform 0.2s ease, color 0.2s ease; }
+    .filter-field.is-open .filter-chevron { transform: rotate(180deg); color: #0f6b4f; }
+    .filter-field.is-active .filter-chevron { color: #0f6b4f; }
+
+    /* Panel daftar opsi (mengganti dropdown native) */
+    .filter-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 100%;
+      z-index: 30;
+      padding: 6px;
+      border-radius: 14px;
+      background: #ffffff;
+      border: 1px solid rgba(15, 107, 79, 0.12);
+      box-shadow: 0 10px 24px rgba(15, 107, 79, 0.15);
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .filter-field.is-open .filter-menu {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .filter-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.45rem 0.7rem;
+      border-radius: 9px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #334155;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .filter-option:hover,
+    .filter-option.is-focused { background: #eef7f3; color: #074a31; }
+    .filter-option.is-selected { background: rgba(15, 107, 79, 0.1); color: #074a31; font-weight: 700; }
+    .filter-option.is-placeholder { color: #94a3b8; }
+    .filter-option .check { font-size: 10px; opacity: 0; color: #0f6b4f; }
+    .filter-option.is-selected .check { opacity: 1; }
+  </style>
+</head>
+
+<body class="bg-gradient-to-b from-slate-50 via-emerald-50 to-slate-50 overflow-x-hidden font-sans text-slate-800 min-h-screen">
+
+  <!-- HEADER -->
+  <header class="bg-gradient-to-r from-white via-emerald-50/30 to-white backdrop-blur-xl border-b border-mpk-primary/10 sticky top-0 z-40 shadow-mpk-sm">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex items-center justify-between gap-4 py-4">
+        <a href="{{ url_for('index') }}" class="brand flex items-center gap-3 group">
+          <img src="{{ url_for('static', filename='assets/mpkphotos.jpeg') }}" alt="Logo MPK MAS Assalafiyyah" class="w-12 h-12 object-cover rounded-xl shadow-mpk">
+          <div class="hidden sm:block">
+            <div class="title font-extrabold text-sm tracking-tight bg-gradient-to-r from-mpk-primary to-mpk-primary-dark bg-clip-text text-transparent">MPK MAS ASSALAFIYYAH</div>
+            <div class="subtitle text-xs text-mpk-muted font-medium">Majelis Permusyawaratan Kelas</div>
+          </div>
+        </a>
+        <div class="flex items-center gap-2">
+          <div id="serverClock" class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full bg-white border border-mpk-primary/15 shadow-mpk-sm text-xs font-semibold text-mpk-muted-dark" title="Waktu server (WIB)">
+            <i class="fas fa-server text-mpk-primary text-[11px]"></i>
+            <span class="font-mono tabular-nums" id="serverClockTime">--:--:--</span>
+            <span class="text-[10px] font-bold text-mpk-primary">WIB</span>
+          </div>
+          <a href="{{ url_for('index') }}" class="px-4 py-2 text-sm font-semibold text-mpk-primary hover:text-mpk-primary-dark transition-colors hidden md:inline-flex items-center gap-2">
+            <i class="fas fa-home"></i> Beranda
+          </a>
+          <a href="{{ url_for('krisisan') }}" class="bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white px-5 py-2.5 rounded-mpk font-semibold text-sm shadow-mpk hover:shadow-mpk-lg transition-all hover:-translate-y-0.5 flex items-center gap-2">
+            <i class="fas fa-bullhorn"></i> Sampaikan Aspirasi
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10">
+
+    <!-- TITLE -->
+    <section class="mb-8">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-mpk-primary/10 text-mpk-primary text-xs font-semibold mb-3">
+            <i class="fas fa-shield-halved"></i> Feed anonim publik
+          </div>
+          <h1 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-mpk-primary to-mpk-primary-dark bg-clip-text text-transparent">Transparansi Aspirasi</h1>
+          <p class="text-mpk-muted text-sm mt-2 max-w-2xl">Semua aspirasi yang masuk ditampilkan di sini tanpa nama. Pantau kode aspirasi Anda untuk melihat perkembangan statusnya.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div id="liveIndicator" class="flex items-center gap-2 px-3 py-2 rounded-full bg-white border border-mpk-primary/15 shadow-mpk-sm text-xs font-semibold text-mpk-muted-dark">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 live-dot"></span>
+            <span id="liveText">Auto refresh dalam <span class="tabular-nums">15</span>S</span>
+          </div>
+          <button id="refreshBtn" type="button" title="Refresh sekarang" class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-mpk-primary/15 shadow-mpk-sm text-mpk-primary hover:bg-mpk-primary hover:text-white transition-colors">
+            <i class="fas fa-rotate-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS CARDS -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-mpk-lg p-5 shadow-mpk border border-mpk-primary/10">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wide text-mpk-muted">Total Masuk</span>
+          <i class="fas fa-inbox text-mpk-primary/60"></i>
+        </div>
+        <div id="statTotal" class="text-3xl font-extrabold text-mpk-primary-dark tabular-nums">–</div>
+        <div class="text-xs text-mpk-muted mt-1">seluruh aspirasi</div>
+      </div>
+
+      <div class="bg-white rounded-mpk-lg p-5 shadow-mpk border border-red-100">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wide text-red-600">Belum Diproses</span>
+          <i class="fas fa-clock text-red-400"></i>
+        </div>
+        <div id="statPending" class="text-3xl font-extrabold text-red-600 tabular-nums">–</div>
+        <div class="text-xs text-mpk-muted mt-1">status pending</div>
+      </div>
+
+      <div class="bg-white rounded-mpk-lg p-5 shadow-mpk border border-amber-100">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wide text-amber-600">Sedang Diproses</span>
+          <i class="fas fa-hourglass-half text-amber-400"></i>
+        </div>
+        <div id="statDiproses" class="text-3xl font-extrabold text-amber-600 tabular-nums">–</div>
+        <div class="text-xs text-mpk-muted mt-1">tengah ditindaklanjuti</div>
+      </div>
+
+      <div class="bg-white rounded-mpk-lg p-5 shadow-mpk border-2 border-emerald-500/60">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wide text-emerald-700">Selesai</span>
+          <i class="fas fa-circle-check text-emerald-500"></i>
+        </div>
+        <div id="statSelesai" class="text-3xl font-extrabold text-emerald-600 tabular-nums">–</div>
+        <div id="statPersen" class="text-xs font-semibold text-emerald-700 mt-1 tabular-nums">— dari total</div>
+      </div>
+    </section>
+
+    <!-- FILTER -->
+    <section class="bg-white rounded-mpk-lg p-4 shadow-mpk-sm border border-mpk-primary/10 mb-4 flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2 mr-2 pr-3 border-r border-slate-200">
+        <i class="fas fa-clock-rotate-left text-mpk-primary text-xs"></i>
+        <div class="leading-tight">
+          <div class="text-[10px] uppercase tracking-wide font-bold text-mpk-muted">Jam server</div>
+          <div class="flex items-baseline gap-1">
+            <span id="filterClockTime" class="font-mono tabular-nums text-sm font-bold text-mpk-primary-dark">--:--:--</span>
+            <span class="text-[10px] font-bold text-mpk-primary">WIB</span>
+          </div>
+          <div id="filterClockDate" class="font-mono text-[10px] text-slate-400 tabular-nums">—</div>
+        </div>
+      </div>
+      <span class="text-xs font-bold uppercase tracking-wide text-mpk-muted mr-1"><i class="fas fa-filter mr-1"></i>Filter</span>
+      <div class="filter-field" data-filter="status">
+        <i class="fas fa-circle-dot field-icon"></i>
+        <button type="button" class="filter-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter status">
+          <span class="filter-label">Semua status</span>
+          <i class="fas fa-chevron-down filter-chevron"></i>
+        </button>
+        <div class="filter-menu" role="listbox" aria-label="Pilih status">
+          <button type="button" class="filter-option is-placeholder is-selected" role="option" data-value="" aria-selected="true">Semua status <i class="fas fa-check check"></i></button>
+          <button type="button" class="filter-option" role="option" data-value="pending" aria-selected="false">Pending <i class="fas fa-check check"></i></button>
+          <button type="button" class="filter-option" role="option" data-value="diproses" aria-selected="false">Diproses <i class="fas fa-check check"></i></button>
+          <button type="button" class="filter-option" role="option" data-value="selesai" aria-selected="false">Selesai <i class="fas fa-check check"></i></button>
+        </div>
+      </div>
+
+      <div class="filter-field" data-filter="kategori">
+        <i class="fas fa-tag field-icon"></i>
+        <button type="button" class="filter-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter kategori">
+          <span class="filter-label">Semua kategori</span>
+          <i class="fas fa-chevron-down filter-chevron"></i>
+        </button>
+        <div class="filter-menu" role="listbox" aria-label="Pilih kategori">
+          <button type="button" class="filter-option is-placeholder is-selected" role="option" data-value="" aria-selected="true">Semua kategori <i class="fas fa-check check"></i></button>
+          <button type="button" class="filter-option" role="option" data-value="Akademik" aria-selected="false">Akademik <i class="fas fa-check check"></i></button>
+          <button type="button" class="filter-option" role="option" data-value="Non-akademik" aria-selected="false">Non-akademik <i class="fas fa-check check"></i></button>
+          <button type="button" class="filter-option" role="option" data-value="Fasilitas" aria-selected="false">Fasilitas <i class="fas fa-check check"></i></button>
+          <button type="button" class="filter-option" role="option" data-value="Lainnya" aria-selected="false">Lainnya <i class="fas fa-check check"></i></button>
+        </div>
+      </div>
+      <button id="resetFilterBtn" type="button" class="hidden items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold text-mpk-primary bg-mpk-primary/10 hover:bg-mpk-primary/15 transition-colors">
+        <i class="fas fa-xmark"></i> Reset
+      </button>
+      <span id="shownCount" class="ml-auto text-xs text-mpk-muted tabular-nums">–</span>
+    </section>
+
+    <!-- FEED TABLE -->
+    <section class="bg-white rounded-mpk-lg shadow-mpk-lg border border-mpk-primary/10 overflow-hidden">
+      <div class="feed-scroll">
+        <table class="feed-table w-full text-left border-collapse min-w-[860px]">
+          <thead>
+            <tr class="text-white text-[11px] uppercase tracking-wider">
+              <th class="px-5 py-3 font-semibold">Time</th>
+              <th class="px-4 py-3 font-semibold">Kode</th>
+              <th class="px-4 py-3 font-semibold">Kelas</th>
+              <th class="px-4 py-3 font-semibold">Kategori</th>
+              <th class="px-4 py-3 font-semibold">Deskripsi</th>
+              <th class="px-4 py-3 font-semibold">Status</th>
+            </tr>
+          </thead>
+          <tbody id="feedBody" class="divide-y divide-slate-100"></tbody>
+        </table>
+
+        <div id="emptyState" class="hidden empty-cell py-16 text-center">
+          <i class="fas fa-inbox text-4xl text-slate-300 mb-3"></i>
+          <p class="text-sm font-semibold text-slate-500">Belum ada aspirasi yang ditampilkan</p>
+          <p class="text-xs text-slate-400 mt-1">Coba ubah filter atau tunggu aspirasi baru masuk.</p>
+        </div>
+
+        <div id="loadingState" class="py-16 text-center">
+          <div class="inline-block w-8 h-8 border-4 border-mpk-primary border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-xs text-slate-400 mt-3">Memuat feed aspirasi...</p>
+        </div>
+      </div>
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+        <p class="text-xs text-slate-500"><i class="fas fa-user-secret mr-1 text-mpk-primary"></i> Feed ini anonim. Nama tidak pernah ditampilkan.</p>
+        <p class="text-xs text-slate-400">Maksimal 100 aspirasi terbaru</p>
+      </div>
+    </section>
+
+    <div class="mt-8 text-center">
+      <a href="{{ url_for('krisisan') }}" class="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-mpk-primary to-mpk-primary-dark text-white font-bold shadow-mpk hover:shadow-mpk-lg hover:-translate-y-0.5 transition-all">
+        <i class="fas fa-pen-alt"></i> Sampaikan aspirasi Anda
+      </a>
+    </div>
+  </main>
+
+  <!-- MODAL DETAIL -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-mpk-lg shadow-2xl max-w-lg w-full animate-modalIn overflow-hidden">
+      <div class="bg-gradient-to-r from-mpk-primary-dark to-mpk-primary px-6 py-4 flex items-center justify-between">
+        <div>
+          <div class="text-white/70 text-[11px] uppercase tracking-wider font-semibold">Detail Aspirasi</div>
+          <div id="modalCode" class="text-white font-mono font-bold text-lg">#0000</div>
+        </div>
+        <button type="button" onclick="closeDetail()" class="w-9 h-9 rounded-full bg-white/15 text-white hover:bg-white/25 transition-colors flex items-center justify-center" aria-label="Tutup">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <span id="modalKelas" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 font-mono text-xs font-semibold"></span>
+          <span id="modalKategori" class="px-2.5 py-1 rounded-full bg-mpk-primary/10 text-mpk-primary text-xs font-semibold"></span>
+          <span id="modalStatus" class="px-2.5 py-1 rounded-full text-xs font-semibold"></span>
+          <span id="modalTime" class="ml-auto text-xs text-slate-400 font-mono tabular-nums"></span>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+          <p id="modalDeskripsi" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line break-words"></p>
+        </div>
+        <p class="text-[11px] text-slate-400"><i class="fas fa-user-secret mr-1"></i>Identitas pengirim tidak disimpan pada tampilan publik.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const REFRESH_SECONDS = 15;
+    const MAX_ITEMS = 100;
+
+    let countdown = REFRESH_SECONDS;
+    let timerId = null;
+    let clockTimerId = null;
+    let feedData = [];
+    let isLoading = false;
+    let activeFilters = { status: '', kategori: '' };
+
+    // Jam server: offset antara waktu server (WIB) dan jam perangkat pengunjung
+    let serverOffsetMs = 0;
+    let serverClockSynced = false;
+
+    const STATUS_STYLE = {
+      pending:  { badge: 'bg-red-100 text-red-700',      label: 'Pending'  },
+      diproses: { badge: 'bg-mpk-accent text-mpk-primary-dark', label: 'Diproses' },
+      selesai:  { badge: 'bg-emerald-100 text-emerald-700', label: 'Selesai' }
+    };
+
+    function escapeHtml(text) {
+      if (text === null || text === undefined) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+    function splitTime(value) {
+      // created_at: "YYYY-MM-DD HH:MM:SS" (UTC dari server)
+      if (!value) return { jam: '--:--', tanggal: '-' };
+      const [datePart, timePart] = value.split(' ');
+      const [y, m, d] = (datePart || '').split('-');
+      const jam = (timePart || '').slice(0, 5) || '--:--';
+      const monthIdx = parseInt(m, 10) - 1;
+      const tanggal = monthIdx >= 0 ? `${parseInt(d, 10)} ${MONTHS[monthIdx]} ${y}` : '-';
+      return { jam, tanggal };
+    }
+
+    function statusBadge(status, idAttr) {
+      const s = STATUS_STYLE[status] || { badge: 'bg-slate-100 text-slate-600', label: status || '-' };
+      const icon = status === 'pending' ? 'fa-clock' : status === 'diproses' ? 'fa-hourglass-half' : 'fa-check';
+      const idPart = idAttr ? ` id="${idAttr}"` : '';
+      return `<span${idPart} class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold ${s.badge}">
+        <i class="fas ${icon}"></i><span class="capitalize">${escapeHtml(s.label)}</span>
+      </span>`;
+    }
+
+    function renderRows() {
+      const tbody = document.getElementById('feedBody');
+      const emptyState = document.getElementById('emptyState');
+      const loadingState = document.getElementById('loadingState');
+
+      loadingState.classList.add('hidden');
+
+      if (!feedData.length) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        document.getElementById('shownCount').textContent = '0 aspirasi';
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      document.getElementById('shownCount').textContent = `${feedData.length} aspirasi`;
+
+      tbody.innerHTML = feedData.map((item, index) => {
+        const t = splitTime(item.created_at);
+        const status = STATUS_STYLE[item.status] ? item.status : 'pending';
+        return `
+          <tr class="feed-row row-in status-${status} hover:bg-emerald-50/50 transition-colors cursor-pointer" data-index="${index}" style="animation-delay:${Math.min(index * 20, 300)}ms">
+            <td class="px-5 py-3 align-top">
+              <div class="font-mono text-sm font-semibold text-slate-700 tabular-nums leading-tight">${escapeHtml(t.jam)}</div>
+              <div class="font-mono text-[11px] text-slate-400 tabular-nums">${escapeHtml(t.tanggal)}</div>
+            </td>
+            <td class="px-4 py-3 align-top">
+              <span class="font-mono text-xs font-semibold text-mpk-primary">${escapeHtml(item.code)}</span>
+            </td>
+            <td class="px-4 py-3 align-top">
+              <span class="inline-block px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-mono text-xs font-semibold">${escapeHtml(item.kelas)}</span>
+            </td>
+            <td class="px-4 py-3 align-top">
+              <span class="inline-block px-2.5 py-0.5 rounded-full bg-mpk-primary/10 text-mpk-primary text-xs font-semibold">${escapeHtml(item.kategori)}</span>
+            </td>
+            <td class="px-4 py-3 align-top max-w-md">
+              <p class="text-sm text-slate-700 leading-snug line-clamp-2">${escapeHtml(item.deskripsi)}</p>
+            </td>
+            <td class="px-4 py-3 align-top">${statusBadge(item.status)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      tbody.querySelectorAll('tr.feed-row').forEach(row => {
+        row.addEventListener('click', () => openDetail(parseInt(row.dataset.index, 10)));
+      });
+    }
+
+    function renderStats(stats) {
+      if (!stats) return;
+      document.getElementById('statTotal').textContent = stats.total;
+      document.getElementById('statPending').textContent = stats.pending;
+      document.getElementById('statDiproses').textContent = stats.diproses;
+      document.getElementById('statSelesai').textContent = stats.selesai;
+      document.getElementById('statPersen').textContent = `${stats.persen_selesai}% dari total`;
+      // server_time hanya jadi cadangan bila /api/server-time belum berhasil
+      if (stats.server_time && !serverClockSynced) {
+        serverClockSynced = true;
+        renderClock();
+      }
+    }
+
+    function renderClock() {
+      if (!serverClockSynced) return;
+      const absolute = new Date(Date.now() + serverOffsetMs);
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hourCycle: 'h23'
+      }).formatToParts(absolute);
+      const get = (type) => parts.find(p => p.type === type)?.value || '00';
+      const time = `${get('hour')}:${get('minute')}:${get('second')}`;
+
+      const dateParts = new Intl.DateTimeFormat('id-ID', {
+        timeZone: 'Asia/Jakarta', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      }).formatToParts(absolute);
+      const dget = (type) => dateParts.find(p => p.type === type)?.value || '';
+      const date = `${dget('weekday')}, ${dget('day')} ${dget('month')} ${dget('year')}`;
+
+      document.getElementById('serverClockTime').textContent = time;
+      document.getElementById('filterClockTime').textContent = time;
+      document.getElementById('filterClockDate').textContent = date;
+    }
+
+    function startClock() {
+      if (clockTimerId) clearInterval(clockTimerId);
+      clockTimerId = setInterval(() => {
+        if (document.hidden) return;
+        renderClock();
+      }, 1000);
+      renderClock();
+    }
+
+    async function loadServerTime() {
+      try {
+        const res = await fetch('/api/server-time', { headers: { 'Accept': 'application/json' } });
+        const json = await res.json();
+        if (json.success && json.data) {
+          serverOffsetMs = json.data.epoch_ms - Date.now();
+          serverClockSynced = true;
+          renderClock();
+        }
+      } catch (error) {
+        console.error('Gagal mengambil waktu server:', error);
+      }
+    }
+
+    async function loadFeed() {
+      if (isLoading) return;
+      isLoading = true;
+
+      const params = new URLSearchParams({ limit: MAX_ITEMS });
+      const status = activeFilters.status;
+      const kategori = activeFilters.kategori;
+      if (status) params.append('status', status);
+      if (kategori) params.append('kategori', kategori);
+
+      const refreshIcon = document.querySelector('#refreshBtn i');
+      refreshIcon.classList.add('animate-spin');
+
+      try {
+        const [feedRes, statsRes] = await Promise.all([
+          fetch(`/api/aspirasi/public?${params.toString()}`, { headers: { 'Accept': 'application/json' } }),
+          fetch('/api/aspirasi/public/stats', { headers: { 'Accept': 'application/json' } })
+        ]);
+
+        const feedJson = await feedRes.json();
+        const statsJson = await statsRes.json();
+
+        if (feedJson.success) {
+          feedData = feedJson.data || [];
+          renderRows();
+        }
+        if (statsJson.success) {
+          renderStats(statsJson.data);
+        }
+      } catch (error) {
+        console.error('Gagal memuat feed aspirasi:', error);
+        document.getElementById('loadingState').classList.add('hidden');
+        if (!feedData.length) {
+          document.getElementById('emptyState').classList.remove('hidden');
+          document.getElementById('emptyState').querySelector('p').textContent = 'Gagal memuat feed. Coba refresh.';
+        }
+      } finally {
+        isLoading = false;
+        refreshIcon.classList.remove('animate-spin');
+        countdown = REFRESH_SECONDS;
+        loadServerTime(); // re-sinkron jam tiap siklus agar tidak melenceng
+      }
+    }
+
+    // ---- countdown & auto refresh ----
+    function updateLiveText() {
+      const liveText = document.getElementById('liveText');
+      if (document.hidden) {
+        liveText.innerHTML = 'Paused (tab tidak aktif)';
+        return;
+      }
+      liveText.innerHTML = `Auto refresh dalam <span class="tabular-nums">${countdown}</span>S`;
+    }
+
+    function tick() {
+      if (document.hidden) {
+        updateLiveText();
+        return;
+      }
+      countdown -= 1;
+      if (countdown <= 0) {
+        loadFeed();
+      }
+      updateLiveText();
+    }
+
+    function startTimer() {
+      if (timerId) clearInterval(timerId);
+      timerId = setInterval(tick, 1000);
+      updateLiveText();
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (timerId) { clearInterval(timerId); timerId = null; }
+      } else {
+        loadServerTime();
+        startTimer();
+        startClock();
+        loadFeed();
+      }
+      updateLiveText();
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', () => loadFeed());
+
+    // ---- dropdown filter kustom (menggantikan <select> native) ----
+    function syncFilterUI() {
+      document.querySelectorAll('.filter-field[data-filter]').forEach(field => {
+        const key = field.dataset.filter;
+        const value = activeFilters[key] || '';
+        const selected = field.querySelector(`.filter-option[data-value="${CSS.escape(value)}"]`);
+        const label = field.querySelector('.filter-label');
+
+        field.querySelectorAll('.filter-option').forEach(opt => {
+          const isSel = opt === selected;
+          opt.classList.toggle('is-selected', isSel);
+          opt.setAttribute('aria-selected', isSel ? 'true' : 'false');
+        });
+        if (selected) label.textContent = selected.textContent.trim();
+        field.classList.toggle('is-active', !!value);
+      });
+
+      const resetBtn = document.getElementById('resetFilterBtn');
+      const anyActive = !!(activeFilters.status || activeFilters.kategori);
+      resetBtn.classList.toggle('hidden', !anyActive);
+      resetBtn.classList.toggle('inline-flex', anyActive);
+    }
+
+    function closeAllMenus(except) {
+      document.querySelectorAll('.filter-field.is-open').forEach(field => {
+        if (field === except) return;
+        field.classList.remove('is-open');
+        field.querySelector('.filter-trigger').setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    document.querySelectorAll('.filter-field[data-filter]').forEach(field => {
+      const trigger = field.querySelector('.filter-trigger');
+      const options = Array.from(field.querySelectorAll('.filter-option'));
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const willOpen = !field.classList.contains('is-open');
+        closeAllMenus(field);
+        field.classList.toggle('is-open', willOpen);
+        trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        if (willOpen) {
+          const current = field.querySelector('.filter-option.is-selected') || options[0];
+          current?.focus();
+        }
+      });
+
+      trigger.addEventListener('keydown', (e) => {
+        if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) {
+          e.preventDefault();
+          trigger.click();
+        }
+      });
+
+      options.forEach((opt, idx) => {
+        opt.addEventListener('click', (e) => {
+          e.stopPropagation();
+          applyFilter(field.dataset.filter, opt.dataset.value);
+          field.classList.remove('is-open');
+          trigger.setAttribute('aria-expanded', 'false');
+          trigger.focus();
+        });
+
+        opt.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            const next = options[(idx + (e.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length];
+            next.focus();
+          } else if (e.key === 'Escape') {
+            field.classList.remove('is-open');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.focus();
+          } else if (e.key === 'Tab') {
+            field.classList.remove('is-open');
+            trigger.setAttribute('aria-expanded', 'false');
+          }
+        });
+      });
+    });
+
+    document.addEventListener('click', () => closeAllMenus());
+
+    function applyFilter(key, value) {
+      if ((activeFilters[key] || '') === value) return;
+      activeFilters[key] = value;
+      syncFilterUI();
+      loadFeed();
+    }
+
+    document.getElementById('resetFilterBtn').addEventListener('click', () => {
+      activeFilters = { status: '', kategori: '' };
+      syncFilterUI();
+      loadFeed();
+    });
+
+    // ---- modal ----
+    function openDetail(index) {
+      const item = feedData[index];
+      if (!item) return;
+      const t = splitTime(item.created_at);
+
+      document.getElementById('modalCode').textContent = item.code;
+      document.getElementById('modalKelas').textContent = item.kelas;
+      document.getElementById('modalKategori').textContent = item.kategori;
+      document.getElementById('modalTime').textContent = `${t.jam} • ${t.tanggal}`;
+      document.getElementById('modalDeskripsi').textContent = item.deskripsi;
+      document.getElementById('modalStatus').outerHTML = statusBadge(item.status, 'modalStatus');
+
+      const modal = document.getElementById('detailModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex', 'animate-fadeIn');
+    }
+
+    function closeDetail() {
+      const modal = document.getElementById('detailModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex', 'animate-fadeIn');
+    }
+
+    document.getElementById('detailModal').addEventListener('click', (e) => {
+      if (e.target.id === 'detailModal') closeDetail();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDetail();
+    });
+
+    // ---- init ----
+    syncFilterUI();
+    loadServerTime();
+    startClock();
+    loadFeed().then(startTimer);
+  </script>
+</body>
+</html>

@@ -4,10 +4,51 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 import os
 import uuid
+
+# --- Zona waktu server (WIB) ---
+# Semua timestamp disimpan di DB dalam UTC (datetime.utcnow, backward compatible),
+# lalu dikonversi ke WIB saat ditampilkan/dikirim ke client.
+try:
+    from zoneinfo import ZoneInfo
+    SERVER_TZ = ZoneInfo('Asia/Jakarta')
+except Exception:  # fallback bila tzdata tidak tersedia
+    SERVER_TZ = timezone(timedelta(hours=7), 'WIB')
+
+SERVER_TZ_LABEL = 'WIB'
+
+
+def to_server_time(dt, fmt='%Y-%m-%d %H:%M:%S'):
+    """Konversi datetime UTC dari DB ke waktu lokal server (WIB) sebagai string."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(SERVER_TZ).strftime(fmt)
+
+
+def derive_aspirasi_code(aspirasi_id):
+    """Kode pendek deterministik dari id (tanpa migration).
+
+    id 1 -> #0001 ... id 9999 -> #9999 ... id 10000 -> #A00G
+    Siswa memakai kode ini untuk melacak aspirasinya di /transparansi.
+    """
+    digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    number = int(aspirasi_id)
+    if number < 10000:
+        return f'#{number:04d}'
+    encoded = ''
+    while number > 0:
+        encoded = digits[number % 36] + encoded
+        number //= 36
+    return f'#{encoded}'
+
+
+# Batas panjang deskripsi aspirasi di feed publik (dipotong di sisi server)
+PUBLIC_DESKRIPSI_MAX = 600
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mpk-secret-key-2026'
@@ -51,6 +92,10 @@ class Aspirasi(db.Model):
     deskripsi = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default='pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @property
+    def code(self):
+        return derive_aspirasi_code(self.id)
 
 class Organization(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -119,6 +164,10 @@ def index():
 @app.route('/krisisan')
 def krisisan():
     return render_template('krisisan.html')
+
+@app.route('/transparansi')
+def transparansi():
+    return render_template('transparansi.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -212,7 +261,95 @@ def save_aspirasi():
     return jsonify({
         'success': True,
         'message': 'Aspirasi berhasil dikirim',
-        'id': aspirasi.id
+        'id': aspirasi.id,
+        'code': aspirasi.code
+    })
+
+@app.route('/api/aspirasi/public', methods=['GET'])
+def get_public_aspirasi():
+    """Feed aspirasi publik untuk halaman transparansi.
+
+    Anonim: `nama` dan `gender` TIDAK pernah dikirim ke client, bukan hanya
+    disembunyikan di sisi JS.
+    """
+    # --- limit ---
+    try:
+        limit = int(request.args.get('limit', 100))
+    except (TypeError, ValueError):
+        limit = 100
+    limit = max(1, min(limit, 500))
+
+    # --- filter (whitelist agar tidak bisa dipakai untuk enumerasi bebas) ---
+    status_filter = request.args.get('status')
+    kategori_filter = request.args.get('kategori')
+    kelas_filter = request.args.get('kelas')
+
+    query = Aspirasi.query
+
+    if status_filter in ('pending', 'diproses', 'selesai'):
+        query = query.filter(Aspirasi.status == status_filter)
+    if kategori_filter:
+        query = query.filter(Aspirasi.kategori == kategori_filter)
+    if kelas_filter:
+        query = query.filter(Aspirasi.kelas == kelas_filter)
+
+    aspirasi_list = query.order_by(Aspirasi.created_at.desc()).limit(limit).all()
+
+    data = []
+    for a in aspirasi_list:
+        deskripsi = a.deskripsi or ''
+        # Batasi panjang per item agar payload feed tetap ringan
+        if len(deskripsi) > PUBLIC_DESKRIPSI_MAX:
+            deskripsi = deskripsi[:PUBLIC_DESKRIPSI_MAX].rstrip() + '…'
+        data.append({
+            'id': a.id,
+            'code': a.code,
+            'created_at': to_server_time(a.created_at),
+            'kelas': a.kelas,
+            'kategori': a.kategori,
+            'deskripsi': deskripsi,
+            'status': a.status,
+        })
+
+    return jsonify({'success': True, 'data': data, 'count': len(data)})
+
+@app.route('/api/aspirasi/public/stats', methods=['GET'])
+def get_public_aspirasi_stats():
+    """Angka statistik untuk kartu statistik halaman transparansi (anonim)."""
+    total = Aspirasi.query.count()
+    pending = Aspirasi.query.filter_by(status='pending').count()
+    diproses = Aspirasi.query.filter_by(status='diproses').count()
+    selesai = Aspirasi.query.filter_by(status='selesai').count()
+    persen_selesai = round((selesai / total) * 100) if total else 0
+
+    return jsonify({
+        'success': True,
+        'data': {
+            'total': total,
+            'pending': pending,
+            'diproses': diproses,
+            'selesai': selesai,
+            'persen_selesai': persen_selesai,
+            'server_time': to_server_time(datetime.utcnow()),
+            'server_tz': SERVER_TZ_LABEL,
+            'server_utc_offset': datetime.now(SERVER_TZ).strftime('%z')
+        }
+    })
+
+@app.route('/api/server-time', methods=['GET'])
+def server_time():
+    """Waktu server untuk halaman publik (WIB), berguna untuk verifikasi jam feed."""
+    now = datetime.now(SERVER_TZ)
+    return jsonify({
+        'success': True,
+        'data': {
+            'datetime': now.strftime('%Y-%m-%d %H:%M:%S'),
+            'time': now.strftime('%H:%M:%S'),
+            'date': now.strftime('%Y-%m-%d'),
+            'timezone': SERVER_TZ_LABEL,
+            'utc_offset': now.strftime('%z'),
+            'epoch_ms': int(now.timestamp() * 1000)
+        }
     })
 
 @app.route('/api/aspirasi', methods=['GET'])
