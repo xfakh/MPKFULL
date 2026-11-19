@@ -145,7 +145,7 @@ docker compose down        # Stop & hapus container
 
 **Catatan:**
 - Port host `8080` dipetakan ke port container `5000` (ubah di `docker-compose.yml` jika perlu)
-- Init database & pembuatan admin default otomatis dijalankan saat container start (via `wsgi.py`)
+- Init database, admin default, dan akun organisasi default otomatis dijalankan saat container start (via `wsgi.py`)
 - Container menggunakan `restart: unless-stopped` dan dilengkapi healthcheck
 
 ## 🔐 Kredensial Admin Default
@@ -156,6 +156,33 @@ Password: mpkassalafiyyah
 ```
 
 ⚠️ **PENTING:** Ganti password default setelah deployment!
+
+## 🏢 Kredensial Organisasi Default
+
+Saat aplikasi pertama kali dijalankan, akun organisasi berikut dibuat otomatis:
+
+| Organisasi | Username | Password |
+|------------|----------|----------|
+| OSIM | `osim` | `osim123` |
+| GPS | `gps` | `gps123` |
+| Jurnalistik | `jurnalistik` | `jurnalistik123` |
+| ARSC | `arsc` | `arsc123` |
+
+Login melalui: **`/login`**
+
+Akun yang sudah ada tidak akan ditimpa. Selama auto-seed aktif, akun default yang dihapus akan dibuat ulang saat aplikasi dijalankan kembali. Auto-seed bisa dimatikan dengan environment variable:
+
+```bash
+AUTO_SEED_ORGANIZATIONS=false
+```
+
+Untuk menjalankan seed secara manual:
+
+```bash
+python scripts/seed_organizations.py
+```
+
+⚠️ **PENTING:** Ganti password default organisasi setelah deployment!
 
 ## 🛣️ API Endpoints
 

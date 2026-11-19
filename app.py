@@ -52,6 +52,11 @@ PUBLIC_DESKRIPSI_MAX = 600
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mpk-secret-key-2026'
+# Akun organisasi awal dibuat otomatis saat aplikasi pertama kali dijalankan.
+# Bisa dimatikan dengan environment variable AUTO_SEED_ORGANIZATIONS=false.
+app.config['AUTO_SEED_ORGANIZATIONS'] = os.environ.get(
+    'AUTO_SEED_ORGANIZATIONS', 'true'
+).lower() in ('1', 'true', 'yes', 'on')
 
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 os.makedirs(data_dir, exist_ok=True)
@@ -147,12 +152,74 @@ def organization_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+DEFAULT_ORGANIZATIONS = [
+    {
+        'name': 'OSIM',
+        'username': 'osim',
+        'email': 'osim@masassalafiyyah.sch.id',
+        'password': 'osim123'
+    },
+    {
+        'name': 'GPS',
+        'username': 'gps',
+        'email': 'gps@masassalafiyyah.sch.id',
+        'password': 'gps123'
+    },
+    {
+        'name': 'Jurnalistik',
+        'username': 'jurnalistik',
+        'email': 'jurnalistik@masassalafiyyah.sch.id',
+        'password': 'jurnalistik123'
+    },
+    {
+        'name': 'ARSC',
+        'username': 'arsc',
+        'email': 'arsc@masassalafiyyah.sch.id',
+        'password': 'arsc123'
+    }
+]
+
 def create_default_admin():
     if Admin.query.count() == 0:
         hashed_password = generate_password_hash('mpkassalafiyyah', method='pbkdf2:sha256')
         admin = Admin(username='admin', password=hashed_password, role='admin')
         db.session.add(admin)
         db.session.commit()
+
+def create_default_organizations(force=False):
+    """Buat akun organisasi awal yang belum terdaftar.
+
+    Aman dijalankan berulang kali: akun yang sudah ada tidak diubah.
+    `force=True` dipakai oleh script seed manual agar tetap berjalan
+    meskipun auto-seed dimatikan lewat environment variable.
+    """
+    if not force and not app.config.get('AUTO_SEED_ORGANIZATIONS', True):
+        return []
+
+    created = []
+    for data in DEFAULT_ORGANIZATIONS:
+        existing = (
+            Organization.query.filter_by(username=data['username']).first()
+            or Organization.query.filter_by(email=data['email']).first()
+            or Organization.query.filter_by(name=data['name']).first()
+        )
+        if existing:
+            continue
+
+        organization = Organization(
+            name=data['name'],
+            username=data['username'],
+            email=data['email'],
+            password=generate_password_hash(data['password'], method='pbkdf2:sha256'),
+            status='active'
+        )
+        db.session.add(organization)
+        created.append(data)
+
+    if created:
+        db.session.commit()
+
+    return created
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -947,7 +1014,11 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         create_default_admin()
+        created_organizations = create_default_organizations()
         print(f"Database created at: {db_path}")
         print("Default admin - username: admin, password: mpkassalafiyyah")
+        if created_organizations:
+            names = ', '.join(org['name'] for org in created_organizations)
+            print(f"Organisasi default dibuat: {names}")
     
     app.run(debug=True, port=5000)
